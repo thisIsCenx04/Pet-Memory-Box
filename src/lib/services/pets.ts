@@ -150,7 +150,7 @@ export async function getPetDetail(id: string) {
       owner: true,
       visibility: true,
       qrTags: { orderBy: { issuedAt: "desc" } },
-      media: { orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }] },
+      media: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
       videos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
       memories: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
       orders: { orderBy: { createdAt: "desc" } },

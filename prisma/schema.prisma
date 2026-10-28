@@ -193,6 +193,10 @@ model MediaAsset {
   petId      String   @map("pet_id") @db.Uuid
   storageKey String   @map("storage_key")
   url        String
+  thumbKey   String?  @map("thumb_key") // bản nhỏ cho lưới ảnh (NFR-02)
+  thumbUrl   String?  @map("thumb_url")
+  width      Int?
+  height     Int?
   mimeType   String   @map("mime_type")
   sizeBytes  Int      @map("size_bytes")
   caption    String?
@@ -213,6 +217,7 @@ model Video {
   url         String
   storageKey  String?     @map("storage_key")
   posterKey   String?     @map("poster_key")
+  posterUrl   String?     @map("poster_url")
   mimeType    String?     @map("mime_type")
   sizeBytes   BigInt?     @map("size_bytes")
   durationSec Int?        @map("duration_sec")

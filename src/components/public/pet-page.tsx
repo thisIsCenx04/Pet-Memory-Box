@@ -43,6 +43,8 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={profile.coverUrl}
+              srcSet={profile.coverThumbUrl ? `${profile.coverThumbUrl} 640w, ${profile.coverUrl} 2000w` : undefined}
+              sizes="(max-width: 400px) 92vw, 352px"
               alt={`Ảnh của ${profile.name}`}
               fetchPriority="high"
               className={`h-full w-full object-cover ${memorial ? "saturate-[0.85]" : ""}`}

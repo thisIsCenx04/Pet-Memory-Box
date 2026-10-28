@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { PublicProfile } from "@/lib/services/public-profile";
+import { Lightbox } from "./lightbox";
 
 const SPECIES = { dog: "Chó", cat: "Mèo", other: "Thú cưng" } as const;
 const GENDER = { male: "Đực", female: "Cái", unknown: "Chưa rõ" } as const;
@@ -63,24 +64,38 @@ export function PetTabs({ profile }: { profile: PublicProfile }) {
 }
 
 function Photos({ profile }: { profile: PublicProfile }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const photos = profile.photos!;
   return (
-    <ul className="grid grid-cols-2 gap-3">
-      {profile.photos!.map((p, i) => (
-        <li key={i}>
-          <figure>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={p.url}
-              alt={p.caption ?? `Ảnh ${i + 1} của ${profile.name}`}
-              loading="lazy"
-              decoding="async"
-              className="aspect-square w-full rounded-2xl bg-sand object-cover"
-            />
-            {p.caption ? <figcaption className="mt-1 text-xs text-ink-soft">{p.caption}</figcaption> : null}
-          </figure>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="grid grid-cols-2 gap-3">
+        {photos.map((p, i) => (
+          <li key={i}>
+            <figure>
+              <button
+                type="button"
+                onClick={() => setOpen(i)}
+                className="group block w-full overflow-hidden rounded-2xl bg-sand"
+                aria-label={`Xem ảnh ${i + 1} cỡ lớn`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.thumbUrl ?? p.url}
+                  alt={p.caption ?? `Ảnh ${i + 1} của ${profile.name}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </button>
+              {p.caption ? <figcaption className="mt-1 text-xs text-ink-soft">{p.caption}</figcaption> : null}
+            </figure>
+          </li>
+        ))}
+      </ul>
+      {open !== null ? (
+        <Lightbox photos={photos} index={open} onIndexChange={setOpen} onClose={() => setOpen(null)} name={profile.name} />
+      ) : null}
+    </>
   );
 }
 

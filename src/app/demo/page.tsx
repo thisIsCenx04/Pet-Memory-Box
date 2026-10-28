@@ -22,6 +22,7 @@ const DEMO: PublicProfile = {
   lifeStatus: "alive",
   passedDate: null,
   coverUrl: null,
+  coverThumbUrl: null,
   note: "Hiền, thích được gãi cằm. Hơi sợ tiếng xe máy.",
   memories: [
     {

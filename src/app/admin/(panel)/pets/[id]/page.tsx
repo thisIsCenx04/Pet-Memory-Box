@@ -4,7 +4,6 @@ import {
   addMemoryAction,
   addVideoLinkAction,
   deleteMemoryAction,
-  deleteVideoAction,
   lifeStatusAction,
   lockTagAction,
   moveMemoryAction,
@@ -16,6 +15,8 @@ import {
   updatePetAction,
 } from "@/app/admin/actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
+import { PhotoManager } from "@/components/admin/photo-manager";
+import { VideoManager } from "@/components/admin/video-manager";
 import { Badge, PageHeader } from "@/components/admin/page-header";
 import { Section } from "@/components/form";
 import {
@@ -28,6 +29,7 @@ import {
   formatDateTime,
   toDateInput,
 } from "@/lib/format";
+import { videoMaxBytes } from "@/lib/services/media";
 import { getPetDetail } from "@/lib/services/pets";
 import { renderQrDataUrl } from "@/lib/services/qr";
 import { publicPetUrl } from "@/lib/site";
@@ -67,7 +69,7 @@ export default async function PetDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string; created?: string }>;
+  searchParams: Promise<{ tab?: string; created?: string; coverFailed?: string }>;
 }) {
   const { id } = await params;
   const sp = await searchParams;
@@ -110,6 +112,12 @@ export default async function PetDetailPage({
           ) : null
         }
       />
+
+      {sp.coverFailed ? (
+        <p role="alert" className="mb-4 rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger">
+          Chưa lưu được ảnh đại diện. Vào tab Ảnh để tải lại.
+        </p>
+      ) : null}
 
       {sp.created ? (
         <p role="status" className="mb-4 rounded-xl bg-sage-soft px-4 py-3 text-sm text-sage-deep">
@@ -185,52 +193,41 @@ export default async function PetDetailPage({
           ) : null}
 
           {tab === "photos" ? (
-            <Section title="Thư viện ảnh" description="JPEG, PNG, WebP, tối đa 5 MB mỗi ảnh và 30 ảnh mỗi bé.">
-              {pet.media.length ? (
-                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {pet.media.map((m) => (
-                    <li key={m.id} className="overflow-hidden rounded-xl border border-sand">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={m.url} alt={m.caption ?? ""} className="aspect-square w-full object-cover" />
-                      {m.isCover ? <p className="px-2 py-1 text-xs font-semibold">Ảnh đại diện</p> : null}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <p className="mt-3 rounded-xl bg-cream px-4 py-3 text-sm text-ink-soft">
-                Tải ảnh lên cần kết nối Supabase Storage và sẽ có ở bước tiếp theo.
-              </p>
+            <Section title="Thư viện ảnh" description="Kéo thả để sắp xếp. Ảnh hiển thị theo thứ tự này trên trang của bé.">
+              <PhotoManager
+                petId={pet.id}
+                photos={pet.media.map((m) => ({
+                  id: m.id,
+                  url: m.url,
+                  thumbUrl: m.thumbUrl,
+                  caption: m.caption,
+                  isCover: m.isCover,
+                }))}
+              />
             </Section>
           ) : null}
 
           {tab === "videos" ? (
-            <Section
-              title="Video"
-              description="Tải video lên (MP4/WebM, tối đa 100 MB, 3 phút) sẽ có cùng Supabase Storage. Hiện có thể dán link YouTube hoặc Vimeo."
-            >
-              {pet.videos.length ? (
-                <ul className="mb-5 divide-y divide-sand rounded-xl border border-sand bg-white">
-                  {pet.videos.map((vd) => (
-                    <li key={vd.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
-                      <div className="min-w-0">
-                        <p className="font-semibold">{vd.title || "Không có tiêu đề"}</p>
-                        <p className="truncate text-xs text-ink-soft">
-                          {vd.source === "upload" ? "Tải lên" : vd.source === "youtube" ? "YouTube" : "Vimeo"} · {vd.url}
-                        </p>
-                      </div>
-                      <ConfirmButton
-                        action={deleteVideoAction.bind(null, vd.id, pet.id)}
-                        confirmText="Xóa video này?"
-                        className="btn-danger"
-                      >
-                        Xóa
-                      </ConfirmButton>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <VideoLinkForm action={addVideoLinkAction.bind(null, pet.id)} />
-            </Section>
+            <>
+              <Section title="Video">
+                <VideoManager
+                  petId={pet.id}
+                  maxBytes={videoMaxBytes()}
+                  videos={pet.videos.map((v) => ({
+                    id: v.id,
+                    source: v.source,
+                    title: v.title,
+                    url: v.url,
+                    posterUrl: v.posterUrl,
+                    durationSec: v.durationSec,
+                    sizeBytes: v.sizeBytes === null ? null : Number(v.sizeBytes),
+                  }))}
+                />
+              </Section>
+              <Section title="Dán link YouTube hoặc Vimeo" description="Dùng cho video dài; không tính vào giới hạn video tải lên.">
+                <VideoLinkForm action={addVideoLinkAction.bind(null, pet.id)} />
+              </Section>
+            </>
           ) : null}
 
           {tab === "memories" ? (

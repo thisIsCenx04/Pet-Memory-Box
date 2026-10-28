@@ -20,8 +20,9 @@ export type PublicProfile = {
   lifeStatus: "alive" | "memorial";
   passedDate: string | null;
   coverUrl: string | null;
+  coverThumbUrl: string | null;
   note?: string;
-  photos?: { url: string; caption: string | null }[];
+  photos?: { url: string; thumbUrl: string | null; caption: string | null; width: number | null; height: number | null }[];
   videos?: { source: "upload" | "youtube" | "vimeo"; url: string; posterUrl: string | null; title: string | null }[];
   memories?: { title: string; date: string | null; content: string }[];
   contact: {
@@ -49,7 +50,7 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
         include: {
           owner: true,
           visibility: true,
-          media: { orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }] },
+          media: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
           videos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
           memories: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
         },
@@ -90,16 +91,23 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
     lifeStatus: pet.lifeStatus,
     passedDate: dateOnly(pet.passedDate),
     coverUrl: cover?.url ?? null,
+    coverThumbUrl: cover?.thumbUrl ?? null,
     contact: { callButton: v.showCallButton },
   };
 
   if (v.showNote && pet.note) profile.note = pet.note;
   if (v.showMedia) {
-    profile.photos = pet.media.map((m) => ({ url: m.url, caption: m.caption }));
+    profile.photos = pet.media.map((m) => ({
+      url: m.url,
+      thumbUrl: m.thumbUrl,
+      caption: m.caption,
+      width: m.width,
+      height: m.height,
+    }));
     profile.videos = pet.videos.map((vd) => ({
       source: vd.source,
       url: vd.url,
-      posterUrl: vd.posterKey ? posterPublicUrl(vd.posterKey) : null,
+      posterUrl: vd.posterUrl,
       title: vd.title,
     }));
   }
@@ -113,11 +121,6 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
   if (v.showAddress && owner.address) profile.contact.address = owner.address;
 
   return { result: "ok", qrTagId: tag.id, profile };
-}
-
-function posterPublicUrl(key: string): string {
-  const base = process.env.SUPABASE_URL?.replace(/\/+$/, "");
-  return `${base}/storage/v1/object/public/pet-media/${key}`;
 }
 
 // ---------- Giới hạn tốc độ (FR-34) và ghi lượt quét (FR-33) ----------

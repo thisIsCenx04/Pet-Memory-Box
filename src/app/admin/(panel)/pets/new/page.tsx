@@ -12,7 +12,7 @@ export default async function NewPetPage() {
       <PageHeader
         crumbs={[{ href: "/admin/pets", label: "Hồ sơ thú cưng" }, { label: "Đăng ký mới" }]}
         title="Đăng ký thú cưng mới"
-        description="Nhập thông tin khách gửi qua tin nhắn, lưu hồ sơ rồi phát hành mã QR để in lên mặt vòng cổ. Ảnh, video và kỷ niệm được thêm ở trang chi tiết sau khi lưu."
+        description="Nhập thông tin khách gửi qua tin nhắn, lưu hồ sơ rồi phát hành mã QR để in lên mặt vòng cổ. Thư viện ảnh, video và kỷ niệm được thêm ở trang chi tiết sau khi lưu."
       />
       <CreatePetForm nextCardNo={nextCardNo} siteUrl={siteUrl()} />
     </>

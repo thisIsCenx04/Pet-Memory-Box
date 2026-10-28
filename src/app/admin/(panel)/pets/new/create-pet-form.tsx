@@ -9,6 +9,7 @@ import {
   noContactLeft,
   type VisibilityName,
 } from "@/components/admin/pet-fields";
+import { CoverPicker } from "@/components/admin/cover-picker";
 import { Field, Notice, Section } from "@/components/form";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -26,6 +27,7 @@ const DEFAULT_VISIBILITY: Record<VisibilityName, boolean> = {
 export function CreatePetForm({ nextCardNo, siteUrl }: { nextCardNo: string; siteUrl: string }) {
   const [state, action] = useActionState<ActionState, FormData>(createPetAction, {});
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
+  const [coverBusy, setCoverBusy] = useState(false);
   const v = state.values ?? {};
   const host = siteUrl.replace(/^https?:\/\//, "");
 
@@ -66,6 +68,9 @@ export function CreatePetForm({ nextCardNo, siteUrl }: { nextCardNo: string; sit
         </Section>
 
         <Section title="Thông tin của bé">
+          <div className="mb-5">
+            <CoverPicker onBusyChange={setCoverBusy} />
+          </div>
           <PetInfoFields
             defaults={v}
             errors={state.errors}
@@ -112,8 +117,8 @@ export function CreatePetForm({ nextCardNo, siteUrl }: { nextCardNo: string; sit
             </label>
           ) : null}
           <div className="mt-4">
-            <SubmitButton className="btn-primary w-full" pendingText="Đang lưu và phát hành…">
-              Lưu và phát hành mã QR
+            <SubmitButton className="btn-primary w-full" pendingText="Đang lưu và phát hành…" disabled={coverBusy}>
+              {coverBusy ? "Đang tải ảnh đại diện…" : "Lưu và phát hành mã QR"}
             </SubmitButton>
           </div>
         </div>

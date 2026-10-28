@@ -21,14 +21,16 @@ npm run db:seed        # tạo tài khoản admin đầu tiên
 npm run dev            # http://localhost:3000, quản trị ở /admin
 ```
 
+Chưa có Supabase Storage thì thêm `STORAGE_DRIVER=local` vào `.env`: ảnh và video lưu ở thư mục `.local-storage` để thử trên máy.
+
 Kiểm tra: `npm run typecheck`, `npm run lint`, `npm test`.
 
 ## Triển khai lên Vercel + Supabase
 
 1. Dự án Supabase hiện ở region **Sydney (ap-southeast-2)**. Trước khi giao vòng cổ đầu tiên, chuyển sang gói **Pro**: gói Free tự tạm dừng sau 1 tuần không hoạt động và không có sao lưu tự động (R-10, NFR-13).
 2. Tạo dự án Vercel tên **pet-memory-box**, Function Region `syd1` (cùng region với cơ sở dữ liệu). Tên dự án quyết định tên miền `*.vercel.app` in trên các vòng đầu tiên, **không bao giờ xóa hay đổi tên dự án** (R-09).
-3. Biến môi trường trên Vercel: như `.env.example`. `DATABASE_URL` dùng pooler cổng 6543, `DIRECT_URL` dùng cổng 5432.
-4. Chạy `npm run db:migrate` và `npm run db:seed` với `DIRECT_URL` của Supabase.
+3. Biến môi trường trên Vercel: như `.env.example`. `DATABASE_URL` dùng pooler cổng 6543, `DIRECT_URL` dùng cổng 5432. `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` lấy ở Supabase → Project Settings → API. `CRON_SECRET` là một chuỗi ngẫu nhiên.
+4. Chạy `npm run db:migrate`, `npm run db:seed` và `npm run storage:setup` (tạo bucket `pet-media`) với `.env` trỏ tới Supabase. Gói Free giới hạn mỗi tệp 50 MB: đặt `VIDEO_MAX_MB=50` ở cả `.env` và Vercel.
 5. Khi có tên miền riêng: thêm tên miền vào dự án Vercel, giữ nguyên tên miền `*.vercel.app` trong dự án, đổi `SITE_URL` sang tên miền mới. Proxy tự chuyển hướng 308 mọi request từ tên miền cũ sang tên miền mới, giữ nguyên `/p/{token}` (FR-37), nên QR đã in vẫn dùng được.
 
 ## Cấu trúc
@@ -57,10 +59,16 @@ src/app/api/                 API-16 (tải QR), API-22 (dữ liệu công khai)
 - Kỷ niệm (thêm, xóa, sắp xếp), link YouTube/Vimeo, đơn hàng, tổng quan, cài đặt Zalo/Messenger, nhật ký thao tác
 - Giới hạn 60 lượt/phút/IP, ghi lượt quét sau khi trả trang, `noindex`, HSTS
 
-Chưa làm (cần dự án Supabase để làm và kiểm thử):
+Ảnh và video:
 
-- Tải ảnh lên Storage, ảnh đại diện khi tạo hồ sơ (API-11, 12, 13, 25)
-- Tải video lên trực tiếp kèm ảnh bìa (API-14 phần upload)
+- Tải nhiều ảnh cùng lúc (kéo thả), nén trên trình duyệt (cạnh dài 2000 px và ảnh nhỏ 640 px), xoay đúng chiều, xóa EXIF và vị trí GPS
+- Chọn ảnh đại diện ngay khi tạo hồ sơ, đổi ảnh đại diện, chú thích, kéo thả sắp xếp, xóa (xóa cả tệp trên kho)
+- Tải video MP4/WebM có thanh tiến độ, kiểm tra thời lượng, chặn video HEVC, tự chụp ảnh bìa; sửa tiêu đề, sắp xếp, xóa
+- Trang của bé: lưới ảnh dùng ảnh nhỏ, trình xem ảnh toàn màn hình (vuốt, phím mũi tên, Esc), video chỉ tải khi bấm phát
+- Dọn ảnh tạm bỏ dở và phiên hết hạn hằng ngày bằng Vercel Cron
+
+Chưa làm:
+
 - Xem trước cấu hình hiển thị chưa lưu (FR-16)
 
 Khác với tài liệu:

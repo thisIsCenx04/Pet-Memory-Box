@@ -43,3 +43,6 @@ next-env.d.ts
 
 # prisma client
 /src/generated/
+
+# tệp tải lên khi chạy với STORAGE_DRIVER=local
+/.local-storage/

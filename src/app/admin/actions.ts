@@ -7,6 +7,7 @@ import { changePassword, login, logout, requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ConflictError, NotFoundError } from "@/lib/errors";
 import { saveSiteSettings, updateOrder } from "@/lib/services/admin-data";
+import { attachCoverFromTmp } from "@/lib/services/media";
 import { createPet, setArchived, setLifeStatus, setVisibility, updatePet } from "@/lib/services/pets";
 import { lockTag, reissueTag, unlockTag } from "@/lib/services/qr";
 import {
@@ -108,8 +109,23 @@ export async function createPetAction(_prev: ActionState, fd: FormData): Promise
   } catch (e) {
     return { ...failure(e), values };
   }
+  // Ảnh đại diện đã tải lên vùng tạm từ trình duyệt (API-25); lỗi ở bước này không làm hỏng hồ sơ vừa tạo.
+  let coverFailed = false;
+  const coverKey = values.coverKey;
+  if (coverKey) {
+    coverFailed = !(await attachCoverFromTmp(
+      id,
+      {
+        key: coverKey,
+        thumbKey: values.coverThumbKey ?? "",
+        width: Number(values.coverWidth) || undefined,
+        height: Number(values.coverHeight) || undefined,
+      },
+      admin.id,
+    ));
+  }
   revalidatePath("/admin", "layout");
-  redirect(`${petPath(id)}?created=1`);
+  redirect(`${petPath(id)}?created=1${coverFailed ? "&coverFailed=1" : ""}`);
 }
 
 export async function updatePetAction(petId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -281,19 +297,6 @@ export async function addVideoLinkAction(petId: string, _prev: ActionState, fd: 
   });
   revalidatePath(petPath(petId));
   return { ok: true, message: "Đã thêm video." };
-}
-
-export async function deleteVideoAction(videoId: string, petId: string): Promise<ActionState> {
-  await requireAdmin();
-  const video = await db.video.findFirst({ where: { id: videoId, petId } });
-  if (!video) return { ok: false, message: "Video không tồn tại" };
-  if (video.source === "upload") {
-    // Xóa tệp trên Storage được thêm cùng chức năng tải video lên.
-    return { ok: false, message: "Chưa hỗ trợ xóa video tải lên ở phiên bản này." };
-  }
-  await db.video.delete({ where: { id: videoId } });
-  revalidatePath(petPath(petId));
-  return { ok: true, message: "Đã xóa video." };
 }
 
 // ---------- Cài đặt ----------
