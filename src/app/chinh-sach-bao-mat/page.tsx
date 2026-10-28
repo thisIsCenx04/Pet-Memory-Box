@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { getSiteSettings } from "@/lib/services/admin-data";
+import { getSiteSettingsSafe } from "@/lib/services/admin-data";
 
 export const metadata: Metadata = {
   title: "Chính sách bảo mật",
@@ -45,7 +45,7 @@ const SECTIONS: [string, string[]][] = [
 ];
 
 export default async function PrivacyPage() {
-  const settings = await getSiteSettings();
+  const settings = await getSiteSettingsSafe();
   return (
     <>
       <span id="top" />

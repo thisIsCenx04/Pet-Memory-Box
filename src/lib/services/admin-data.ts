@@ -106,6 +106,23 @@ export type SiteSettings = Record<(typeof SETTING_KEYS)[number], string>;
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const rows = await db.siteSetting.findMany({ where: { key: { in: [...SETTING_KEYS] } } });
+  return toSettings(rows);
+}
+
+/**
+ * Dùng cho trang công khai (landing, chính sách): lỗi cơ sở dữ liệu không làm sập trang,
+ * chỉ ẩn phần liên hệ và ghi log.
+ */
+export async function getSiteSettingsSafe(): Promise<SiteSettings> {
+  try {
+    return await getSiteSettings();
+  } catch (e) {
+    console.error("site_settings_unavailable", e);
+    return toSettings([]);
+  }
+}
+
+function toSettings(rows: { key: string; value: string }[]): SiteSettings {
   const out = Object.fromEntries(SETTING_KEYS.map((k) => [k, ""])) as SiteSettings;
   for (const r of rows) out[r.key as keyof SiteSettings] = r.value;
   return out;

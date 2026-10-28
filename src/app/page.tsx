@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { getSiteSettings } from "@/lib/services/admin-data";
+import { getSiteSettingsSafe } from "@/lib/services/admin-data";
 
 // S-01. Đọc liên hệ từ site_settings nên render theo request.
 export const dynamic = "force-dynamic";
@@ -153,7 +153,7 @@ function SectionTitle({ eyebrow, title, children }: { eyebrow: string; title: st
 }
 
 export default async function LandingPage() {
-  const settings = await getSiteSettings();
+  const settings = await getSiteSettingsSafe();
 
   return (
     <>
