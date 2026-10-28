@@ -38,10 +38,24 @@ export class StorageNotConfiguredError extends Error {
 
 // ---------- Supabase ----------
 
-function supabaseDriver(url: string, serviceKey: string): Driver {
-  const client = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+/**
+ * Chỉ giữ phần gốc https://<ref>.supabase.co. Copy nhầm cả "/rest/v1/" hay dấu "/" cuối
+ * làm Supabase báo "Invalid path specified in request URL".
+ */
+export function normalizeSupabaseUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/^["']|["']$/g, "");
+  try {
+    return new URL(trimmed).origin;
+  } catch {
+    throw new Error(`SUPABASE_URL không hợp lệ: "${trimmed}". Dạng đúng: https://<project-ref>.supabase.co`);
+  }
+}
+
+function supabaseDriver(rawUrl: string, serviceKey: string): Driver {
+  const url = normalizeSupabaseUrl(rawUrl);
+  const client = createClient(url, serviceKey.trim(), { auth: { persistSession: false, autoRefreshToken: false } });
   const bucket = client.storage.from(BUCKET);
-  const base = url.replace(/\/+$/, "");
+  const base = url;
   return {
     async signedUpload(key, contentType) {
       const { data, error } = await bucket.createSignedUploadUrl(key);

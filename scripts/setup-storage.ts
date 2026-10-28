@@ -8,14 +8,27 @@ const BUCKET = "pet-media";
 const MIME = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"];
 
 async function main() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Cần SUPABASE_URL và SUPABASE_SERVICE_ROLE_KEY trong .env");
+  const rawUrl = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!rawUrl || !key) throw new Error("Cần SUPABASE_URL và SUPABASE_SERVICE_ROLE_KEY trong .env");
+  let url: string;
+  try {
+    // Chỉ giữ https://<ref>.supabase.co, bỏ "/rest/v1/" hoặc dấu "/" thừa
+    url = new URL(rawUrl.trim()).origin;
+  } catch {
+    throw new Error(`SUPABASE_URL không hợp lệ: "${rawUrl}". Dạng đúng: https://<project-ref>.supabase.co`);
+  }
+  console.log(`Kết nối ${url} ...`);
   const mb = Number(process.env.VIDEO_MAX_MB) || 100;
   const options = { public: true, fileSizeLimit: `${mb}MB`, allowedMimeTypes: MIME };
 
   const supabase = createClient(url, key, { auth: { persistSession: false } });
-  const { data: existing } = await supabase.storage.getBucket(BUCKET);
+  const { data: existing, error: getError } = await supabase.storage.getBucket(BUCKET);
+  if (getError && !/not found/i.test(getError.message)) {
+    throw new Error(
+      `${getError.message}\nKiểm tra SUPABASE_URL (Project Settings → API → Project URL) và SUPABASE_SERVICE_ROLE_KEY (khóa service_role, không phải anon).`,
+    );
+  }
   const { error } = existing
     ? await supabase.storage.updateBucket(BUCKET, options)
     : await supabase.storage.createBucket(BUCKET, options);
