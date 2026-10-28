@@ -357,9 +357,6 @@ export default async function LandingPage() {
                   </a>
                 ) : null}
               </div>
-              {!settings.zalo_url && !settings.messenger_url && !settings.hotline ? (
-                <p className="mt-4 text-sm text-ink-soft">Kênh liên hệ đang được cập nhật.</p>
-              ) : null}
             </Reveal>
             <Reveal variant="right" delay={120} className="card rotate-1 p-7 shadow-[0_24px_50px_-30px_rgb(63_51_41/0.45)]">
               <p className="font-hand text-2xl text-rust">Chuẩn bị sẵn</p>

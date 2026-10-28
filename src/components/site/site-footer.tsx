@@ -71,17 +71,15 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
             <FooterLink href="/chinh-sach-bao-mat">Chính sách bảo mật</FooterLink>
           </Column>
 
-          <Column title="Liên hệ">
-            {contacts.length ? (
-              contacts.map((c) => (
+          {contacts.length ? (
+            <Column title="Liên hệ">
+              {contacts.map((c) => (
                 <FooterLink key={c.href} href={c.href} external={c.external}>
                   {c.label}
                 </FooterLink>
-              ))
-            ) : (
-              <li className="text-cream/60">Thông tin liên hệ đang được cập nhật.</li>
-            )}
-          </Column>
+              ))}
+            </Column>
+          ) : null}
         </div>
 
         <p className="py-10 text-center font-hand text-2xl text-peach sm:text-3xl">
