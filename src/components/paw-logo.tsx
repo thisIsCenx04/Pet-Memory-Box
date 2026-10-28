@@ -11,10 +11,12 @@ export function PawMark({ className = "h-6 w-6" }: { className?: string }) {
   );
 }
 
-export function Wordmark({ className = "" }: { className?: string }) {
+export function Wordmark({ className = "", tone = "ink" }: { className?: string; tone?: "ink" | "cream" }) {
+  const text = tone === "cream" ? "text-cream" : "text-ink";
+  const mark = tone === "cream" ? "text-peach" : "text-ink";
   return (
-    <span className={`inline-flex items-center gap-2 font-heading text-[15px] font-bold tracking-wide text-ink ${className}`}>
-      <PawMark className="h-5 w-5 text-ink" />
+    <span className={`inline-flex items-center gap-2 font-heading text-[15px] font-bold tracking-wide ${text} ${className}`}>
+      <PawMark className={`h-5 w-5 ${mark}`} />
       PET MEMORY BOX
     </span>
   );

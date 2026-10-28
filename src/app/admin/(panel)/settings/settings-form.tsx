@@ -5,6 +5,16 @@ import type { ActionState } from "@/app/admin/actions";
 import { Field, Notice } from "@/components/form";
 import { SubmitButton } from "@/components/submit-button";
 
+const FIELDS = [
+  { name: "zalo_url", label: "Liên kết Zalo", type: "url", hint: "Ví dụ: https://zalo.me/0901234567" },
+  { name: "messenger_url", label: "Liên kết Messenger", type: "url", hint: "Ví dụ: https://m.me/tenfanpage" },
+  { name: "hotline", label: "Số điện thoại hotline", type: "tel", hint: "Hiện ở chân trang và trang mã không khả dụng." },
+  { name: "contact_email", label: "Email liên hệ", type: "email" },
+  { name: "facebook_url", label: "Trang Facebook", type: "url" },
+  { name: "tiktok_url", label: "Kênh TikTok", type: "url" },
+  { name: "service_area", label: "Khu vực phục vụ", type: "text", hint: "Ví dụ: Giao hàng toàn quốc, làm hộp tại TP.HCM" },
+] as const;
+
 export function SettingsForm({
   action,
   defaults,
@@ -17,20 +27,11 @@ export function SettingsForm({
   return (
     <form action={formAction} className="card space-y-4 p-6" noValidate>
       <Notice state={state} />
-      <Field label="Liên kết Zalo" htmlFor="zalo_url" error={state.errors?.zalo_url} hint="Ví dụ: https://zalo.me/0901234567">
-        <input id="zalo_url" name="zalo_url" type="url" className="input" defaultValue={v.zalo_url} />
-      </Field>
-      <Field
-        label="Liên kết Messenger"
-        htmlFor="messenger_url"
-        error={state.errors?.messenger_url}
-        hint="Ví dụ: https://m.me/tenfanpage"
-      >
-        <input id="messenger_url" name="messenger_url" type="url" className="input" defaultValue={v.messenger_url} />
-      </Field>
-      <Field label="Email liên hệ (chân trang)" htmlFor="contact_email" error={state.errors?.contact_email}>
-        <input id="contact_email" name="contact_email" type="email" className="input" defaultValue={v.contact_email} />
-      </Field>
+      {FIELDS.map((f) => (
+        <Field key={f.name} label={f.label} htmlFor={f.name} error={state.errors?.[f.name]} hint={"hint" in f ? f.hint : undefined}>
+          <input id={f.name} name={f.name} type={f.type} className="input" defaultValue={v[f.name]} />
+        </Field>
+      ))}
       <SubmitButton>Lưu cài đặt</SubmitButton>
     </form>
   );

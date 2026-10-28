@@ -93,12 +93,20 @@ export async function updateOrder(
   });
 }
 
-export const SETTING_KEYS = ["zalo_url", "messenger_url", "contact_email"] as const;
+export const SETTING_KEYS = [
+  "zalo_url",
+  "messenger_url",
+  "contact_email",
+  "hotline",
+  "facebook_url",
+  "tiktok_url",
+  "service_area",
+] as const;
 export type SiteSettings = Record<(typeof SETTING_KEYS)[number], string>;
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const rows = await db.siteSetting.findMany({ where: { key: { in: [...SETTING_KEYS] } } });
-  const out = { zalo_url: "", messenger_url: "", contact_email: "" };
+  const out = Object.fromEntries(SETTING_KEYS.map((k) => [k, ""])) as SiteSettings;
   for (const r of rows) out[r.key as keyof SiteSettings] = r.value;
   return out;
 }

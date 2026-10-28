@@ -246,17 +246,16 @@ export default async function PetDetailPage({
                         </div>
                         <div className="flex gap-1">
                           <form action={moveMemoryAction.bind(null, m.id, pet.id, -1)}>
-                            <button className="btn-outline px-3" disabled={i === 0} aria-label="Đưa lên">
-                              ↑
+                            <button className="btn-outline px-3" disabled={i === 0} >
+                              Lên
                             </button>
                           </form>
                           <form action={moveMemoryAction.bind(null, m.id, pet.id, 1)}>
                             <button
                               className="btn-outline px-3"
                               disabled={i === pet.memories.length - 1}
-                              aria-label="Đưa xuống"
-                            >
-                              ↓
+                              >
+                              Xuống
                             </button>
                           </form>
                           <ConfirmButton

@@ -168,10 +168,29 @@ export const memorySchema = z.object({
 
 export const lockSchema = z.object({ reason: requiredText(1, 200, "Lý do khóa") });
 
+const optionalHttps = blank(z.union([z.literal(""), z.url({ protocol: /^https$/, error: "Cần đường dẫn https" })]));
+
 export const settingsSchema = z.object({
-  zalo_url: z.union([z.literal(""), z.url({ protocol: /^https$/, error: "Cần đường dẫn https" })]),
-  messenger_url: z.union([z.literal(""), z.url({ protocol: /^https$/, error: "Cần đường dẫn https" })]),
-  contact_email: z.union([z.literal(""), z.email("Email không hợp lệ")]),
+  zalo_url: optionalHttps,
+  messenger_url: optionalHttps,
+  facebook_url: optionalHttps,
+  tiktok_url: optionalHttps,
+  contact_email: blank(z.union([z.literal(""), z.email("Email không hợp lệ")])),
+  hotline: blank(
+    z
+      .string()
+      .trim()
+      .transform((v, ctx) => {
+        if (v === "") return "";
+        const n = normalizeVnPhone(v);
+        if (!n) {
+          ctx.addIssue({ code: "custom", message: "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0 hoặc +84" });
+          return z.NEVER;
+        }
+        return n;
+      }),
+  ),
+  service_area: blank(z.string().trim().max(120, "Tối đa 120 ký tự")),
 });
 
 /** Chuyển FormData thành object; các khóa trong `booleans` thành true khi ô được chọn. */

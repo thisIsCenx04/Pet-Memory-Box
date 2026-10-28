@@ -11,7 +11,7 @@ export default async function SettingsPage() {
     <>
       <PageHeader
         title="Cài đặt trang web"
-        description="Liên kết nhắn tin trên landing page. Nút tương ứng tự ẩn khi để trống."
+        description="Thông tin liên hệ trên landing page và chân trang. Mục nào để trống sẽ tự ẩn."
       />
       <div className="max-w-xl">
         <SettingsForm action={saveSettingsAction} defaults={settings} />

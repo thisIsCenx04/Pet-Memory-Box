@@ -77,3 +77,164 @@ h3 {
 @utility eyebrow {
     @apply text-xs font-semibold tracking-[0.14em] text-ink-soft uppercase;
 }
+
+/* ===== Chuyển động ===== */
+
+/* Hiện dần khi cuộn tới. Chỉ ẩn trước khi JS chạy được (html.js) để không mất nội dung khi tắt JS. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html.js [data-reveal="left"] {
+  transform: translateX(-24px);
+}
+html.js [data-reveal="right"] {
+  transform: translateX(24px);
+}
+html.js [data-reveal="scale"] {
+  transform: scale(0.96);
+}
+html.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+}
+@keyframes tilt-soft {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(-6px);
+  }
+}
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: var(--len, 400);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility animate-rise {
+  animation: rise-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@utility animate-float {
+  animation: float-soft 7s ease-in-out infinite;
+}
+@utility animate-tilt {
+  animation: tilt-soft 8s ease-in-out infinite;
+}
+@utility animate-fade {
+  animation: fade-in 0.35s ease-out both;
+}
+@utility animate-draw {
+  stroke-dasharray: var(--len, 400);
+  animation: draw-line 1.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@utility lift {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px -18px rgb(63 51 41 / 0.35);
+  }
+}
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+  &:hover {
+    background-size: 100% 1px;
+  }
+}
+
+/* Nút: nhấn có độ nén nhẹ */
+.btn-primary,
+.btn-outline,
+.btn-danger {
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+.btn-primary:active,
+.btn-outline:active,
+.btn-danger:active {
+  transform: scale(0.97);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 18px -10px rgb(69 88 60 / 0.7);
+}
+
+/* Hỏi đáp mở ra mượt (trình duyệt hỗ trợ ::details-content) */
+:root {
+  interpolate-size: allow-keywords;
+}
+.faq::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.35s ease,
+    content-visibility 0.35s allow-discrete;
+}
+.faq[open]::details-content {
+  block-size: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}

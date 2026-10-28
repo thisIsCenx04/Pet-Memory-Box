@@ -37,7 +37,7 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
         <span className="font-mono text-xs text-ink-soft">{profile.cardNo}</span>
       </header>
 
-      <section className="px-4 text-center">
+      <section className="animate-rise px-4 text-center">
         <div className="mx-auto aspect-square w-full max-w-[22rem] overflow-hidden rounded-[2rem] bg-sand">
           {profile.coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -48,8 +48,10 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
               className={`h-full w-full object-cover ${memorial ? "saturate-[0.85]" : ""}`}
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sand-deep">
-              <PawMark className="h-24 w-24" />
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-peach-soft to-sand">
+              <span className="font-heading text-[9rem] leading-none font-bold text-rust/60">
+                {profile.name.charAt(0).toUpperCase()}
+              </span>
             </div>
           )}
         </div>
@@ -85,7 +87,7 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
         ) : null}
       </section>
 
-      <section className="mt-8 px-4">
+      <section className="animate-rise mt-8 px-4" style={{ "--rise-delay": "150ms" } as React.CSSProperties}>
         <PetTabs profile={profile} />
       </section>
 

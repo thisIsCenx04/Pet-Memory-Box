@@ -44,7 +44,7 @@ export function PetTabs({ profile }: { profile: PublicProfile }) {
             aria-selected={active === t.key}
             aria-controls={`panel-${t.key}`}
             onClick={() => setActive(t.key)}
-            className={`-mb-px min-h-11 flex-1 border-b-2 text-sm font-semibold ${
+            className={`-mb-px min-h-11 flex-1 border-b-2 text-sm font-semibold transition-colors duration-200 ${
               active === t.key ? "border-sage text-sage-deep" : "border-transparent text-ink-soft"
             }`}
           >
@@ -52,7 +52,7 @@ export function PetTabs({ profile }: { profile: PublicProfile }) {
           </button>
         ))}
       </div>
-      <div role="tabpanel" id={`panel-${active}`} aria-labelledby={`tab-${active}`} className="pt-4">
+      <div key={active} role="tabpanel" id={`panel-${active}`} aria-labelledby={`tab-${active}`} className="animate-fade pt-4">
         {active === "photos" ? <Photos profile={profile} /> : null}
         {active === "videos" ? <Videos profile={profile} /> : null}
         {active === "memories" ? <Memories profile={profile} /> : null}
