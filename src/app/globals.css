@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* Bảng màu be + xanh rêu + hồng đào (SRS 15.4). Chỉ có giao diện sáng theo thiết kế. */
+@theme {
+  --color-cream: #f6efe4;
+  --color-paper: #fbf8f2;
+  --color-sand: #ece2d1;
+  --color-sand-deep: #d8c8ae;
+  --color-ink: #3f3329;
+  --color-ink-soft: #6b5c4e;
+  --color-sage: #566b4b;
+  --color-sage-deep: #45583c;
+  --color-sage-soft: #dfe6d5;
+  --color-peach: #e8b9a1;
+  --color-peach-soft: #f5e2d7;
+  --color-rust: #9c5235;
+  --color-danger: #a33b2c;
+  --color-danger-soft: #f6dcd6;
+
+  --font-heading: var(--font-baloo), ui-rounded, system-ui, sans-serif;
+  --font-sans: var(--font-be-vietnam), system-ui, sans-serif;
+  --font-hand: var(--font-patrick), "Comic Sans MS", cursive;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  line-height: 1.15;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 2px;
+}
+
+/* Thành phần dùng chung (Tailwind v4: @utility thay cho @layer components) */
+@utility btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+    @apply btn bg-sage text-white hover:bg-sage-deep;
+}
+
+@utility btn-outline {
+    @apply btn border border-sand-deep bg-paper text-ink hover:bg-sand;
+}
+
+@utility btn-danger {
+    @apply btn border border-danger/40 bg-paper text-danger hover:bg-danger-soft;
+}
+
+@utility card {
+    @apply rounded-2xl border border-sand bg-paper;
+}
+
+@utility input {
+    @apply min-h-11 w-full rounded-xl border border-sand-deep bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-soft/70 focus:border-sage focus:outline-none;
+}
+
+@utility label {
+    @apply mb-1 block text-sm font-medium text-ink;
+}
+
+@utility eyebrow {
+    @apply text-xs font-semibold tracking-[0.14em] text-ink-soft uppercase;
+}
