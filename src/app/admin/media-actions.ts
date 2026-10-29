@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
+import { ForbiddenError, requirePetEditor } from "@/lib/owner-auth";
 import { ConflictError, NotFoundError } from "@/lib/errors";
 import {
   confirmPhoto,
@@ -21,6 +22,7 @@ import {
 import { StorageNotConfiguredError, type UploadTarget } from "@/lib/storage";
 
 // Server Action cho ảnh và video (UC-12, UC-13), gọi trực tiếp từ component phía trình duyệt.
+// Admin và chủ nuôi của chính hồ sơ đều dùng được (requirePetEditor).
 
 export type MediaResult<T = undefined> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -28,7 +30,12 @@ async function run<T>(fn: () => Promise<T>): Promise<MediaResult<T>> {
   try {
     return { ok: true, data: await fn() };
   } catch (e) {
-    if (e instanceof ConflictError || e instanceof NotFoundError || e instanceof StorageNotConfiguredError) {
+    if (
+      e instanceof ConflictError ||
+      e instanceof NotFoundError ||
+      e instanceof StorageNotConfiguredError ||
+      e instanceof ForbiddenError
+    ) {
       return { ok: false, message: e.message };
     }
     if (e instanceof z.ZodError) return { ok: false, message: "Dữ liệu không hợp lệ" };
@@ -38,7 +45,15 @@ async function run<T>(fn: () => Promise<T>): Promise<MediaResult<T>> {
 }
 
 const uuid = z.uuid();
-const petPath = (id: string) => `/admin/pets/${id}`;
+function refresh(petId: string) {
+  revalidatePath(`/admin/pets/${petId}`);
+  revalidatePath(`/chu-nuoi/${petId}`);
+}
+
+/** Kiểm tra quyền trong run() để lỗi quyền trả về thông báo thay vì làm hỏng trang. */
+async function editor(petId: string) {
+  return requirePetEditor(uuid.parse(petId));
+}
 
 const photoReq = z.object({
   mimeType: z.string(),
@@ -51,59 +66,60 @@ export async function requestPhotoUploadsAction(
   petId: string,
   items: z.input<typeof photoReq>[],
 ): Promise<MediaResult<{ photo: UploadTarget; thumb: UploadTarget }[]>> {
-  await requireAdmin();
-  return run(() => requestPhotoUploads(uuid.parse(petId), z.array(photoReq).parse(items)));
+  return run(async () => {
+    await editor(petId);
+    return requestPhotoUploads(uuid.parse(petId), z.array(photoReq).parse(items));
+  });
 }
 
 export async function confirmPhotoAction(
   petId: string,
   input: { key: string; thumbKey: string; width?: number; height?: number },
 ): Promise<MediaResult<{ id: string }>> {
-  const admin = await requireAdmin();
   const res = await run(async () => {
+    const actor = await editor(petId);
     const parsed = z
       .object({ key: z.string(), thumbKey: z.string(), width: z.number().optional(), height: z.number().optional() })
       .parse(input);
-    const asset = await confirmPhoto(uuid.parse(petId), parsed, admin.id);
+    const asset = await confirmPhoto(uuid.parse(petId), parsed, actor);
     return { id: asset.id };
   });
-  if (res.ok) revalidatePath(petPath(petId));
+  if (res.ok) refresh(petId);
   return res;
 }
 
 export async function setCoverPhotoAction(petId: string, photoId: string): Promise<MediaResult> {
-  await requireAdmin();
   const res = await run(async () => {
+    await editor(petId);
     await setCoverPhoto(uuid.parse(petId), uuid.parse(photoId));
     return undefined;
   });
-  revalidatePath(petPath(petId));
+  refresh(petId);
   return res;
 }
 
 export async function updatePhotoCaptionAction(petId: string, photoId: string, caption: string): Promise<MediaResult> {
-  await requireAdmin();
   return run(async () => {
+    await editor(petId);
     await updatePhotoCaption(uuid.parse(petId), uuid.parse(photoId), z.string().max(500).parse(caption));
-    revalidatePath(petPath(petId));
+    refresh(petId);
     return undefined;
   });
 }
 
 export async function reorderPhotosAction(petId: string, ids: string[]): Promise<MediaResult> {
-  await requireAdmin();
   return run(async () => {
+    await editor(petId);
     await reorderPhotos(uuid.parse(petId), z.array(uuid).max(100).parse(ids));
-    revalidatePath(petPath(petId));
+    refresh(petId);
     return undefined;
   });
 }
 
 export async function deletePhotoAction(petId: string, photoId: string): Promise<MediaResult> {
-  const admin = await requireAdmin();
   return run(async () => {
-    await deletePhoto(uuid.parse(petId), uuid.parse(photoId), admin.id);
-    revalidatePath(petPath(petId));
+    await deletePhoto(uuid.parse(petId), uuid.parse(photoId), await editor(petId));
+    refresh(petId);
     return undefined;
   });
 }
@@ -127,49 +143,50 @@ export async function requestVideoUploadAction(
   petId: string,
   input: z.input<typeof videoReq>,
 ): Promise<MediaResult<{ video: UploadTarget; poster: UploadTarget }>> {
-  await requireAdmin();
-  return run(() => requestVideoUpload(uuid.parse(petId), videoReq.parse(input)));
+  return run(async () => {
+    await editor(petId);
+    return requestVideoUpload(uuid.parse(petId), videoReq.parse(input));
+  });
 }
 
 export async function confirmVideoAction(
   petId: string,
   input: { key: string; posterKey: string; durationSec: number; title?: string },
 ): Promise<MediaResult<{ id: string }>> {
-  const admin = await requireAdmin();
   const res = await run(async () => {
+    const actor = await editor(petId);
     const parsed = z
       .object({ key: z.string(), posterKey: z.string(), durationSec: z.number().positive(), title: z.string().optional() })
       .parse(input);
-    const v = await confirmVideo(uuid.parse(petId), parsed, admin.id);
+    const v = await confirmVideo(uuid.parse(petId), parsed, actor);
     return { id: v.id };
   });
-  if (res.ok) revalidatePath(petPath(petId));
+  if (res.ok) refresh(petId);
   return res;
 }
 
 export async function deleteVideoAction(petId: string, videoId: string): Promise<MediaResult> {
-  const admin = await requireAdmin();
   return run(async () => {
-    await deleteVideo(uuid.parse(petId), uuid.parse(videoId), admin.id);
-    revalidatePath(petPath(petId));
+    await deleteVideo(uuid.parse(petId), uuid.parse(videoId), await editor(petId));
+    refresh(petId);
     return undefined;
   });
 }
 
 export async function updateVideoTitleAction(petId: string, videoId: string, title: string): Promise<MediaResult> {
-  await requireAdmin();
   return run(async () => {
+    await editor(petId);
     await updateVideoTitle(uuid.parse(petId), uuid.parse(videoId), z.string().max(300).parse(title));
-    revalidatePath(petPath(petId));
+    refresh(petId);
     return undefined;
   });
 }
 
 export async function moveVideoAction(petId: string, videoId: string, direction: -1 | 1): Promise<MediaResult> {
-  await requireAdmin();
   return run(async () => {
+    await editor(petId);
     await moveVideo(uuid.parse(petId), uuid.parse(videoId), direction === -1 ? -1 : 1);
-    revalidatePath(petPath(petId));
+    refresh(petId);
     return undefined;
   });
 }

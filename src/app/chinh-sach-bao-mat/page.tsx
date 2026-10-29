@@ -5,7 +5,7 @@ import { getSiteSettingsSafe } from "@/lib/services/admin-data";
 
 export const metadata: Metadata = {
   title: "Chính sách bảo mật",
-  description: "Pet Memory Box thu thập, hiển thị và bảo vệ thông tin của chủ nuôi như thế nào.",
+  description: "Furever thu thập, hiển thị và bảo vệ thông tin của chủ nuôi như thế nào.",
 };
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ const SECTIONS: [string, string[]][] = [
   [
     "Bảo vệ dữ liệu",
     [
-      "Toàn bộ kết nối dùng HTTPS. Chỉ admin của Pet Memory Box đăng nhập được vào trang quản trị.",
+      "Toàn bộ kết nối dùng HTTPS. Chỉ admin của Furever đăng nhập được vào trang quản trị.",
       "Dữ liệu được lưu trên hạ tầng có sao lưu hằng ngày. Chúng mình không bán hay chia sẻ thông tin của bạn cho bên thứ ba.",
     ],
   ],
@@ -51,7 +51,7 @@ export default async function PrivacyPage() {
       <span id="top" />
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="eyebrow">Pet Memory Box</p>
+        <p className="eyebrow">Furever</p>
         <h1 className="animate-rise mt-2 text-4xl font-bold sm:text-5xl">Chính sách bảo mật</h1>
         <p className="mt-4 text-ink-soft">
           Thông tin của bé và của bạn là những điều riêng tư. Trang này giải thích chúng mình lưu gì, hiển thị gì và bạn

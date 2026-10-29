@@ -1,5 +1,7 @@
-import { PawMark } from "@/components/paw-logo";
+import { BrandMark } from "@/components/paw-logo";
 import type { PublicProfile } from "@/lib/services/public-profile";
+import { FoundReport } from "./found-report";
+import { Guestbook } from "./guestbook";
 import { PetTabs } from "./pet-tabs";
 
 const SPECIES = { dog: "Chó", cat: "Mèo", other: "Thú cưng" } as const;
@@ -16,7 +18,16 @@ function prettyPhone(p: string) {
 }
 
 /** Trang Digital Memory (S-03), dùng chung cho /p/[token] và /demo. */
-export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: React.ReactNode }) {
+export function PetPage({
+  profile,
+  banner,
+  token,
+}: {
+  profile: PublicProfile;
+  banner?: React.ReactNode;
+  /** Token của mã QR, để gửi vị trí hoặc lời nhắn. Trang mẫu không có. */
+  token?: string;
+}) {
   const memorial = profile.lifeStatus === "memorial";
   const { contact } = profile;
   const subtitle = [SPECIES[profile.species] + (profile.breed ? ` ${profile.breed}` : ""), GENDER[profile.gender]]
@@ -28,11 +39,13 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
       : null;
 
   return (
+    // Trang tưởng niệm dùng tông đen trắng (theme-mono đổi bảng màu trong globals.css)
+    <div className={`min-h-dvh bg-cream ${memorial ? "theme-mono" : ""}`}>
     <main className="mx-auto min-h-dvh max-w-md bg-cream pb-10">
       {banner}
       <header className="flex items-center justify-between px-4 py-4">
         <span className="inline-flex items-center gap-2 font-heading text-sm font-bold tracking-wide">
-          <PawMark className="h-4 w-4" /> PET MEMORY BOX
+          <BrandMark className="h-6 w-6" /> FUREVER
         </span>
         <span className="font-mono text-xs text-ink-soft">{profile.cardNo}</span>
       </header>
@@ -89,14 +102,23 @@ export function PetPage({ profile, banner }: { profile: PublicProfile; banner?: 
         ) : null}
       </section>
 
+      {!memorial && token ? (
+        <div className="px-4">
+          <FoundReport token={token} name={profile.name} />
+        </div>
+      ) : null}
+
       <section className="animate-rise mt-8 px-4" style={{ "--rise-delay": "150ms" } as React.CSSProperties}>
         <PetTabs profile={profile} />
       </section>
 
+      {profile.guestbookOpen ? <Guestbook token={token} name={profile.name} entries={profile.guestbook ?? []} /> : null}
+
       <footer className="mt-10 px-6 text-center">
         <p className="font-hand text-xl text-rust">Vì tình yêu thương luôn tồn tại, theo một cách khác.</p>
-        <p className="mt-2 text-xs text-ink-soft">Thẻ được cấp bởi Pet Memory Box · Thông tin do chủ nuôi cung cấp</p>
+        <p className="mt-2 text-xs text-ink-soft">Thẻ được cấp bởi Furever · Thông tin do chủ nuôi cung cấp</p>
       </footer>
     </main>
+    </div>
   );
 }

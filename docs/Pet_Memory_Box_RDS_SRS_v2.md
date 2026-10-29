@@ -21,6 +21,20 @@ Bản v2 chốt các câu hỏi mở của bản v1 và sửa các điểm mâu 
 | D-11 | Mọi mã không dùng được đều trả 404 để không lộ việc mã từng tồn tại; lý do thật chỉ ghi trong scan_logs | UC-21, FR-31, API-22 |
 | D-12 | Token thống nhất 22 ký tự; nhật ký admin thêm restore, memorial, password_change | R-01, FR-35, audit_logs |
 
+## Nhật ký thay đổi v3 (29/10/2026)
+
+Đưa vào sản phẩm bốn tính năng v2 để ngoài phạm vi, và đổi tên website thành Furever.
+
+| Mã | Thay đổi |
+| --- | --- |
+| D-13 | Tên website là Furever (logo trái tim dấu chân); "Pet Memory Box" là tên sản phẩm |
+| D-14 | Tài khoản chủ nuôi: đăng nhập OTP 6 số qua email (hạn 10 phút, sai tối đa 5 lần, gửi lại sau 60 giây, tối đa 5 mã mỗi giờ); quyền theo owners.email; phiên 30 ngày ở owner_sessions |
+| D-15 | Báo khi có người quét: email cho chủ nuôi tối đa 30 phút một lần (pets.last_scan_notified_at), chỉ với bé đang sống, tắt được trong cổng chủ nuôi (owners.notify_scan) |
+| D-16 | Người nhặt gửi vị trí GPS, lời nhắn, số điện thoại (bảng found_reports), chỉ gửi riêng cho chủ nuôi, tối đa 5 lần mỗi giờ mỗi IP |
+| D-17 | Đặt hàng online và thanh toán VietQR (bảng order_requests): mã đơn FVxxxxxx, đường dẫn xem đơn có token 22 ký tự, admin xác nhận tiền về thủ công, chuyển đơn thành hồ sơ |
+| D-18 | Sổ lưu bút trang tưởng niệm (bảng guestbook_entries): lời nhắn chờ duyệt, công tắc show_guestbook; trang tưởng niệm dùng tông đen trắng |
+| D-19 | audit_logs.admin_id cho phép null, thêm actor_email để ghi thao tác của chủ nuôi |
+
 # PHẦN I – RDS (Requirements Definition Specification)
 
 ## 1. Tổng quan dự án

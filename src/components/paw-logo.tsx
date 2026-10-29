@@ -1,4 +1,4 @@
-/** Logo dấu chân vẽ riêng (SRS 15.4: không dùng bộ icon có sẵn). */
+/** Dấu chân vẽ tay, dùng trong hình minh họa hộp thiếc. */
 export function PawMark({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true" fill="currentColor">
@@ -11,13 +11,53 @@ export function PawMark({ className = "h-6 w-6" }: { className?: string }) {
   );
 }
 
-export function Wordmark({ className = "", tone = "ink" }: { className?: string; tone?: "ink" | "cream" }) {
-  const text = tone === "cream" ? "text-cream" : "text-ink";
-  const mark = tone === "cream" ? "text-peach" : "text-ink";
+/** Logo trái tim dấu chân của Furever. */
+export function BrandMark({ className = "h-7 w-7", tone = "ink" }: { className?: string; tone?: "ink" | "cream" }) {
   return (
-    <span className={`inline-flex items-center gap-2 font-heading text-[15px] font-bold tracking-wide ${text} ${className}`}>
-      <PawMark className={`h-5 w-5 ${mark}`} />
-      PET MEMORY BOX
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={tone === "cream" ? "/brand/furever-mark-cream.webp" : "/brand/furever-mark.webp"}
+      alt=""
+      aria-hidden="true"
+      width={256}
+      height={256}
+      className={`object-contain ${className}`}
+    />
+  );
+}
+
+export function Wordmark({
+  className = "",
+  tone = "ink",
+  sub,
+}: {
+  className?: string;
+  tone?: "ink" | "cream";
+  sub?: string;
+}) {
+  const text = tone === "cream" ? "text-cream" : "text-ink";
+  return (
+    <span className={`inline-flex items-center gap-2 ${text} ${className}`}>
+      <BrandMark tone={tone} className="h-8 w-8" />
+      <span className="leading-none">
+        <span className="block font-heading text-lg font-bold tracking-wide">FUREVER</span>
+        <span className={`block text-[10px] font-semibold tracking-[0.2em] ${tone === "cream" ? "text-cream/70" : "text-ink-soft"}`}>
+          {sub ?? "PET MEMORY BOX"}
+        </span>
+      </span>
     </span>
+  );
+}
+
+export function FullLogo({ className = "", tone = "ink" }: { className?: string; tone?: "ink" | "cream" }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={tone === "cream" ? "/brand/furever-logo-cream.webp" : "/brand/furever-logo.webp"}
+      alt="Furever Pet Memory Box"
+      width={600}
+      height={700}
+      className={className}
+    />
   );
 }

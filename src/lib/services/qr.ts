@@ -3,10 +3,10 @@ import QRCode from "qrcode";
 import { db } from "../db";
 import { ConflictError, NotFoundError, isUniqueViolation } from "../errors";
 import { generatePublicToken } from "../tokens";
-import { audit } from "./audit";
+import { audit, type Actor } from "./audit";
 
 /** UC-16: khóa mã đang active. */
-export async function lockTag(qrId: string, reason: string, adminId: string) {
+export async function lockTag(qrId: string, reason: string, actor: Actor) {
   await db.$transaction(async (tx) => {
     const tag = await tx.qrTag.findUnique({ where: { id: qrId } });
     if (!tag) throw new NotFoundError("Mã không tồn tại");
@@ -15,18 +15,18 @@ export async function lockTag(qrId: string, reason: string, adminId: string) {
       where: { id: qrId },
       data: { status: "locked", lockReason: reason, lockedAt: new Date() },
     });
-    await audit(tx, adminId, "lock", "qr_tag", qrId, reason);
+    await audit(tx, actor, "lock", "qr_tag", qrId, reason);
   });
 }
 
 /** UC-16 A1: mở khóa; mã replaced không mở được (FR-24). */
-export async function unlockTag(qrId: string, adminId: string) {
+export async function unlockTag(qrId: string, actor: Actor) {
   await db.$transaction(async (tx) => {
     const tag = await tx.qrTag.findUnique({ where: { id: qrId } });
     if (!tag) throw new NotFoundError("Mã không tồn tại");
     if (tag.status !== "locked") throw new ConflictError("Chỉ mở khóa được mã đang bị khóa");
     await tx.qrTag.update({ where: { id: qrId }, data: { status: "active", lockReason: null, lockedAt: null } });
-    await audit(tx, adminId, "unlock", "qr_tag", qrId);
+    await audit(tx, actor, "unlock", "qr_tag", qrId);
   });
 }
 

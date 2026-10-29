@@ -25,6 +25,9 @@ export type PublicProfile = {
   photos?: { url: string; thumbUrl: string | null; caption: string | null; width: number | null; height: number | null }[];
   videos?: { source: "upload" | "youtube" | "vimeo"; url: string; posterUrl: string | null; title: string | null }[];
   memories?: { title: string; date: string | null; content: string }[];
+  /** Sổ lưu bút: chỉ có ở trang tưởng niệm khi được bật; chỉ gồm lời nhắn đã duyệt. */
+  guestbook?: { name: string; message: string; date: string }[];
+  guestbookOpen: boolean;
   contact: {
     callButton: boolean;
     phone?: string;
@@ -35,7 +38,7 @@ export type PublicProfile = {
 };
 
 export type PublicLookup =
-  | { result: "ok"; qrTagId: string; profile: PublicProfile }
+  | { result: "ok"; qrTagId: string; petId: string; profile: PublicProfile }
   | { result: Exclude<ScanResult, "ok">; qrTagId: string | null };
 
 const dateOnly = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
@@ -53,6 +56,7 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
           media: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
           videos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
           memories: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+          guestbook: { where: { status: "approved" }, orderBy: { createdAt: "desc" }, take: 50 },
         },
       },
     },
@@ -74,6 +78,7 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
     showNote: false,
     showMedia: false,
     showMemories: false,
+    showGuestbook: false,
   };
   const { owner } = pet;
   const cover = pet.media.find((m) => m.isCover) ?? pet.media[0];
@@ -93,6 +98,7 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
     coverUrl: cover?.url ?? null,
     coverThumbUrl: cover?.thumbUrl ?? null,
     contact: { callButton: v.showCallButton },
+    guestbookOpen: pet.lifeStatus === "memorial" && v.showGuestbook,
   };
 
   if (v.showNote && pet.note) profile.note = pet.note;
@@ -114,13 +120,20 @@ export async function lookupPublicProfile(token: string): Promise<PublicLookup> 
   if (v.showMemories) {
     profile.memories = pet.memories.map((m) => ({ title: m.title, date: dateOnly(m.memoryDate), content: m.content }));
   }
+  if (profile.guestbookOpen) {
+    profile.guestbook = pet.guestbook.map((g) => ({
+      name: g.authorName,
+      message: g.message,
+      date: g.createdAt.toISOString(),
+    }));
+  }
   // Nút gọi cần số chính; số chỉ lộ ra khi nút gọi hoặc ô số điện thoại được bật.
   if (v.showCallButton || v.showPhone) profile.contact.phone = owner.phone;
   if (v.showPhone2 && owner.phone2) profile.contact.phone2 = owner.phone2;
   if (v.showArea && owner.area) profile.contact.area = owner.area;
   if (v.showAddress && owner.address) profile.contact.address = owner.address;
 
-  return { result: "ok", qrTagId: tag.id, profile };
+  return { result: "ok", qrTagId: tag.id, petId: pet.id, profile };
 }
 
 // ---------- Giới hạn tốc độ (FR-34) và ghi lượt quét (FR-33) ----------

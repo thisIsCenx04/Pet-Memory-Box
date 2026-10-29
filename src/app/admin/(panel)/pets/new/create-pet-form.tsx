@@ -22,6 +22,7 @@ const DEFAULT_VISIBILITY: Record<VisibilityName, boolean> = {
   showNote: true,
   showMedia: true,
   showMemories: true,
+  showGuestbook: true,
 };
 
 export function CreatePetForm({ nextCardNo, siteUrl }: { nextCardNo: string; siteUrl: string }) {

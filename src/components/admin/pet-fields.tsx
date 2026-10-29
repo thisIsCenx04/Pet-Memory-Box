@@ -144,6 +144,15 @@ export function OwnerFields({ defaults, errors }: { defaults: PetFieldDefaults; 
       <Field label="Địa chỉ đầy đủ" htmlFor="address" error={e.address}>
         <input id="address" name="address" className="input" maxLength={200} defaultValue={d.address} />
       </Field>
+      <Field
+        label="Email chủ nuôi"
+        htmlFor="ownerEmail"
+        error={e.ownerEmail}
+        className="sm:col-span-2"
+        hint="Để chủ nuôi tự đăng nhập bằng mã gửi qua email, tự thêm ảnh, kỷ niệm và nhận thông báo khi có người quét mã."
+      >
+        <input id="ownerEmail" name="ownerEmail" type="email" className="input" defaultValue={d.ownerEmail} />
+      </Field>
     </div>
   );
 }
@@ -157,6 +166,7 @@ export const VISIBILITY_OPTIONS = [
   { name: "showNote", label: "Lưu ý về tính cách và sức khỏe" },
   { name: "showMedia", label: "Ảnh và video" },
   { name: "showMemories", label: "Câu chuyện, kỷ niệm" },
+  { name: "showGuestbook", label: "Sổ lưu bút (trang tưởng niệm)" },
 ] as const;
 
 export type VisibilityName = (typeof VISIBILITY_OPTIONS)[number]["name"];

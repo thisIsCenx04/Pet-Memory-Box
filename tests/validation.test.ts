@@ -43,6 +43,7 @@ const base = {
   showNote: true,
   showMedia: true,
   showMemories: true,
+  showGuestbook: true,
   package: "full_box",
   orderNote: "",
   confirmDuplicate: false,

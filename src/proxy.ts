@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE } from "@/lib/session-cookie";
+import { OWNER_COOKIE, SESSION_COOKIE } from "@/lib/session-cookie";
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -26,6 +26,14 @@ export function proxy(req: NextRequest) {
     if (!origin || new URL(origin).host !== req.headers.get("host")) {
       return NextResponse.json({ error: { code: "forbidden", message: "Nguồn yêu cầu không hợp lệ" } }, { status: 403 });
     }
+  }
+
+  // Cổng chủ nuôi: chưa có cookie phiên thì về trang đăng nhập OTP.
+  if (pathname.startsWith("/chu-nuoi") && pathname !== "/chu-nuoi/dang-nhap" && !req.cookies.has(OWNER_COOKIE)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/chu-nuoi/dang-nhap";
+    url.search = "";
+    return NextResponse.redirect(url);
   }
 
   // FR-08: chặn sớm khi không có cookie phiên. Phiên được kiểm tra đầy đủ ở máy chủ (requireAdmin).

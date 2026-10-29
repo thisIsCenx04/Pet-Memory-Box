@@ -33,7 +33,7 @@ export function SiteHeader() {
           scrolled ? "py-2.5" : "py-4"
         }`}
       >
-        <Link href="/" aria-label="Pet Memory Box, về trang chủ">
+        <Link href="/" aria-label="Furever, về trang chủ">
           <Wordmark />
         </Link>
         <nav className="hidden gap-7 text-sm md:flex" aria-label="Mục trang">
@@ -44,7 +44,10 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/#lien-he" className="btn-primary hidden sm:inline-flex">
+          <Link href="/chu-nuoi/dang-nhap" className="link-underline hidden px-2 py-1 text-sm lg:inline">
+            Chủ nuôi
+          </Link>
+          <Link href="/dat-hang" className="btn-primary hidden sm:inline-flex">
             Đặt hộp cho bé
           </Link>
           <button
@@ -69,7 +72,10 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <Link href="/#lien-he" onClick={() => setOpen(false)} className="btn-primary mt-3 w-full">
+          <Link href="/chu-nuoi/dang-nhap" onClick={() => setOpen(false)} className="flex min-h-12 items-center text-base">
+            Trang chủ nuôi
+          </Link>
+          <Link href="/dat-hang" onClick={() => setOpen(false)} className="btn-primary mt-3 w-full">
             Đặt hộp cho bé
           </Link>
         </nav>

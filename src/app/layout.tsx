@@ -3,8 +3,11 @@ import { baloo, beVietnam, patrick } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Pet Memory Box", template: "%s · Pet Memory Box" },
-  description: "Hộp kỷ vật và trang Digital Memory riêng cho thú cưng, mở bằng mã QR trên vòng cổ.",
+  title: { default: "Furever · Pet Memory Box", template: "%s · Furever" },
+  description: "Furever: hộp kỷ vật và trang Digital Memory riêng cho thú cưng, mở bằng mã QR trên vòng cổ.",
+  applicationName: "Furever",
+  metadataBase: new URL(process.env.SITE_URL || "http://localhost:3000"),
+  openGraph: { siteName: "Furever", locale: "vi_VN", type: "website" },
 };
 
 export const viewport: Viewport = {

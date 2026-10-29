@@ -9,7 +9,7 @@ export default async function DashboardPage() {
     { label: "Hồ sơ đang hiển thị", value: d.pets, href: "/admin/pets?status=active" },
     { label: "Mã QR đang hoạt động", value: d.activeTags, href: "/admin/qr?status=active" },
     { label: "Lượt quét 7 ngày qua", value: d.scans7d, href: "/admin/qr" },
-    { label: "Đơn đang làm", value: d.orders.received + d.orders.preparing, href: "/admin/orders?status=preparing" },
+    { label: "Đơn online chờ thanh toán", value: d.pendingPayments, href: "/admin/don-online?status=pending_payment" },
   ];
   return (
     <>

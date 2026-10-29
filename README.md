@@ -1,6 +1,6 @@
-# Pet Memory Box
+# Furever · Pet Memory Box
 
-Website đi kèm hộp kỷ vật thú cưng: trang Digital Memory mở bằng mã QR trên vòng cổ, và trang quản trị để admin nhập hồ sơ, phát hành, khóa và cấp lại mã. Đặc tả: `docs/Pet_Memory_Box_RDS_SRS_v2.md` (bản v2).
+Website Furever đi kèm hộp kỷ vật thú cưng: trang Digital Memory mở bằng mã QR trên vòng cổ, và trang quản trị để admin nhập hồ sơ, phát hành, khóa và cấp lại mã. Đặc tả: `docs/Pet_Memory_Box_RDS_SRS_v2.md` (bản v2).
 
 ## Công nghệ
 
@@ -30,8 +30,9 @@ Kiểm tra: `npm run typecheck`, `npm run lint`, `npm test`.
 1. Dự án Supabase hiện ở region **Sydney (ap-southeast-2)**. Trước khi giao vòng cổ đầu tiên, chuyển sang gói **Pro**: gói Free tự tạm dừng sau 1 tuần không hoạt động và không có sao lưu tự động (R-10, NFR-13).
 2. Tạo dự án Vercel tên **pet-memory-box**, Function Region `syd1` (cùng region với cơ sở dữ liệu). Tên dự án quyết định tên miền `*.vercel.app` in trên các vòng đầu tiên, **không bao giờ xóa hay đổi tên dự án** (R-09).
 3. Biến môi trường trên Vercel: như `.env.example`. `DATABASE_URL` dùng pooler cổng 6543, `DIRECT_URL` dùng cổng 5432. `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` lấy ở Supabase → Project Settings → API. `CRON_SECRET` là một chuỗi ngẫu nhiên.
-4. Chạy `npm run db:migrate`, `npm run db:seed` và `npm run storage:setup` (tạo bucket `pet-media`) với `.env` trỏ tới Supabase. Gói Free giới hạn mỗi tệp 50 MB: đặt `VIDEO_MAX_MB=50` ở cả `.env` và Vercel.
-5. Khi có tên miền riêng: thêm tên miền vào dự án Vercel, giữ nguyên tên miền `*.vercel.app` trong dự án, đổi `SITE_URL` sang tên miền mới. Proxy tự chuyển hướng 308 mọi request từ tên miền cũ sang tên miền mới, giữ nguyên `/p/{token}` (FR-37), nên QR đã in vẫn dùng được.
+4. Email: điền `SMTP_*` và `MAIL_FROM` (ví dụ Gmail với mật khẩu ứng dụng). Thiếu SMTP thì email chỉ được in ra log và chủ nuôi không nhận được mã đăng nhập.
+5. Chạy `npm run db:migrate`, `npm run db:seed` và `npm run storage:setup` (tạo bucket `pet-media`) với `.env` trỏ tới Supabase. Gói Free giới hạn mỗi tệp 50 MB: đặt `VIDEO_MAX_MB=50` ở cả `.env` và Vercel.
+6. Khi có tên miền riêng: thêm tên miền vào dự án Vercel, giữ nguyên tên miền `*.vercel.app` trong dự án, đổi `SITE_URL` sang tên miền mới. Proxy tự chuyển hướng 308 mọi request từ tên miền cũ sang tên miền mới, giữ nguyên `/p/{token}` (FR-37), nên QR đã in vẫn dùng được.
 
 ## Cấu trúc
 
@@ -58,6 +59,13 @@ src/app/api/                 API-16 (tải QR), API-22 (dữ liệu công khai)
 - Tải QR PNG 1024 px / SVG, khóa, mở khóa, phát hành lại; trigger chặn mã `replaced` quay lại
 - Kỷ niệm (thêm, xóa, sắp xếp), link YouTube/Vimeo, đơn hàng, tổng quan, cài đặt Zalo/Messenger, nhật ký thao tác
 - Giới hạn 60 lượt/phút/IP, ghi lượt quét sau khi trả trang, `noindex`, HSTS
+
+Tính năng mở rộng:
+
+- Đặt hàng online `/dat-hang`: chọn gói theo bảng giá trong Cài đặt, thanh toán bằng mã VietQR tự sinh (đúng chuẩn NAPAS, điền sẵn số tiền và nội dung `FUREVER <mã đơn>`); admin bấm "Đã nhận tiền" ở `/admin/don-online`, rồi "Tạo hồ sơ" để chuyển đơn thành hồ sơ và phát hành mã QR
+- Tài khoản chủ nuôi `/chu-nuoi`: đăng nhập bằng mã OTP 6 số gửi qua email (email nhập trong hồ sơ); tự sửa mô tả, ảnh, video, kỷ niệm, hiển thị công khai, khóa và mở khóa mã, xem lượt quét
+- Báo khi có người quét: email cho chủ nuôi (tối đa 30 phút một lần, kèm khu vực ước tính của Vercel); người nhặt được bé bấm "Tôi đang thấy bé" để gửi vị trí GPS, lời nhắn và số điện thoại riêng cho chủ nuôi
+- Sổ lưu bút trên trang tưởng niệm (tông đen trắng): lời nhắn chờ chủ nuôi hoặc admin duyệt, có giới hạn tần suất và bẫy bot
 
 Ảnh và video:
 

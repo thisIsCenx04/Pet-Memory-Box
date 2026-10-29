@@ -7,7 +7,7 @@ import { audit } from "./audit";
 /** UC-23 */
 export async function getDashboard() {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const [pets, activeTags, scans7d, ordersByStatus, latest] = await Promise.all([
+  const [pets, activeTags, scans7d, ordersByStatus, latest, pendingPayments] = await Promise.all([
     db.pet.count({ where: { status: "active" } }),
     db.qrTag.count({ where: { status: "active" } }),
     db.scanLog.count({ where: { scannedAt: { gte: since }, result: "ok" } }),
@@ -23,10 +23,11 @@ export async function getDashboard() {
         orders: { orderBy: { createdAt: "desc" }, take: 1, select: { status: true } },
       },
     }),
+    db.orderRequest.count({ where: { status: "pending_payment" } }),
   ]);
   const orders = { received: 0, preparing: 0, issued: 0, delivered: 0 } as Record<OrderStatus, number>;
   for (const row of ordersByStatus) orders[row.status] = row._count._all;
-  return { pets, activeTags, scans7d, orders, latest };
+  return { pets, activeTags, scans7d, orders, latest, pendingPayments };
 }
 
 export async function nextCardNoPreview(): Promise<string> {
@@ -101,8 +102,21 @@ export const SETTING_KEYS = [
   "facebook_url",
   "tiktok_url",
   "service_area",
+  "price_full_box",
+  "price_tag_only",
+  "bank_bin",
+  "bank_account",
+  "bank_account_name",
 ] as const;
 export type SiteSettings = Record<(typeof SETTING_KEYS)[number], string>;
+
+/** Giá trị dùng khi admin chưa lưu cài đặt (tài khoản nhận tiền và trang Facebook của nhóm). */
+const SETTING_DEFAULTS: Partial<SiteSettings> = {
+  facebook_url: "https://www.facebook.com/share/1EhvaZPBMU/",
+  bank_bin: "970436",
+  bank_account: "9917624270",
+  bank_account_name: "NGUYEN MINH THU",
+};
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const rows = await db.siteSetting.findMany({ where: { key: { in: [...SETTING_KEYS] } } });
@@ -123,7 +137,7 @@ export async function getSiteSettingsSafe(): Promise<SiteSettings> {
 }
 
 function toSettings(rows: { key: string; value: string }[]): SiteSettings {
-  const out = Object.fromEntries(SETTING_KEYS.map((k) => [k, ""])) as SiteSettings;
+  const out = Object.fromEntries(SETTING_KEYS.map((k) => [k, SETTING_DEFAULTS[k] ?? ""])) as SiteSettings;
   for (const r of rows) out[r.key as keyof SiteSettings] = r.value;
   return out;
 }
@@ -131,10 +145,10 @@ function toSettings(rows: { key: string; value: string }[]): SiteSettings {
 export async function saveSiteSettings(values: SiteSettings, adminId: string) {
   await db.$transaction(async (tx) => {
     for (const key of SETTING_KEYS) {
-      const value = values[key];
-      if (value) await tx.siteSetting.upsert({ where: { key }, update: { value }, create: { key, value } });
-      else await tx.siteSetting.deleteMany({ where: { key } });
+      // Lưu cả giá trị rỗng để admin xóa được mục có giá trị mặc định
+      const value = values[key] ?? "";
+      await tx.siteSetting.upsert({ where: { key }, update: { value }, create: { key, value } });
     }
-    await audit(tx, adminId, "update", "site_settings", adminId, "settings");
+    await audit(tx, { adminId }, "update", "site_settings", adminId, "settings");
   });
 }

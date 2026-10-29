@@ -238,3 +238,23 @@ html.js [data-reveal].is-visible {
 html {
   scroll-behavior: smooth;
 }
+
+/* Trang tưởng niệm: tông đen trắng. Đổi biến màu trong phạm vi để mọi tiện ích dùng màu mới. */
+.theme-mono {
+  --color-cream: #f3f3f2;
+  --color-paper: #ffffff;
+  --color-sand: #e1e1e0;
+  --color-sand-deep: #c2c2c0;
+  --color-ink: #141414;
+  --color-ink-soft: #555555;
+  --color-sage: #1c1c1c;
+  --color-sage-deep: #000000;
+  --color-sage-soft: #e8e8e8;
+  --color-peach: #8a8a8a;
+  --color-peach-soft: #ececec;
+  --color-rust: #3a3a3a;
+  color: var(--color-ink);
+}
+.theme-mono img[src^="/brand/"] {
+  filter: grayscale(1) brightness(0.55);
+}

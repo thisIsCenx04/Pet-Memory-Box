@@ -46,3 +46,4 @@ next-env.d.ts
 
 # tệp tải lên khi chạy với STORAGE_DRIVER=local
 /.local-storage/
+/.local-outbox/

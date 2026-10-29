@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wordmark } from "@/components/paw-logo";
+import { FullLogo } from "@/components/paw-logo";
 import type { SiteSettings } from "@/lib/services/admin-data";
 
 function prettyPhone(p: string) {
@@ -49,7 +49,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
       <div className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
         <div className="grid gap-10 border-b border-cream/15 pb-12 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <Wordmark tone="cream" />
+            <FullLogo tone="cream" className="h-auto w-32" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/75">
               Hộp thiếc lưu giữ kỷ vật và vòng cổ gắn mã QR, mở ra trang Digital Memory riêng cho từng bé. Dành cho bé
               đang ở bên bạn, và cả những bé đã đi xa.
@@ -67,7 +67,8 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           <Column title="Hỗ trợ">
             <FooterLink href="/#hoi-dap">Hỏi đáp</FooterLink>
             <FooterLink href="/#hoi-dap">Mất vòng cổ thì làm gì?</FooterLink>
-            <FooterLink href="/#lien-he">Đặt hộp cho bé</FooterLink>
+            <FooterLink href="/dat-hang">Đặt hộp cho bé</FooterLink>
+            <FooterLink href="/chu-nuoi/dang-nhap">Trang chủ nuôi</FooterLink>
             <FooterLink href="/chinh-sach-bao-mat">Chính sách bảo mật</FooterLink>
           </Column>
 
@@ -87,7 +88,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
         </p>
 
         <div className="flex flex-col gap-3 border-t border-cream/15 py-6 text-xs text-cream/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Pet Memory Box. Thông tin trên trang của mỗi bé do chủ nuôi cung cấp.</p>
+          <p>© {year} Furever · Pet Memory Box. Thông tin trên trang của mỗi bé do chủ nuôi cung cấp.</p>
           <a href="#top" className="link-underline self-start text-cream/80 hover:text-cream sm:self-auto">
             Lên đầu trang
           </a>

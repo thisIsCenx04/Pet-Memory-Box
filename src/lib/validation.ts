@@ -99,6 +99,14 @@ export const ownerFieldsSchema = z.object({
   zaloMessenger,
   area: optionalText(100),
   address: optionalText(200),
+  ownerEmail: blank(
+    z
+      .string()
+      .trim()
+      .toLowerCase()
+      .refine((v) => v === "" || z.email().safeParse(v).success, "Email không hợp lệ")
+      .transform((v) => v || null),
+  ),
 });
 
 export const visibilitySchema = z.object({
@@ -110,6 +118,7 @@ export const visibilitySchema = z.object({
   showNote: z.boolean(),
   showMedia: z.boolean(),
   showMemories: z.boolean(),
+  showGuestbook: z.boolean(),
 });
 
 export const VISIBILITY_KEYS = Object.keys(visibilitySchema.shape) as (keyof Visibility)[];
@@ -166,7 +175,25 @@ export const memorySchema = z.object({
   content: requiredText(1, 5000, "Nội dung"),
 });
 
+export type MemoryInput = z.infer<typeof memorySchema>;
+
 export const lockSchema = z.object({ reason: requiredText(1, 200, "Lý do khóa") });
+
+/** Giá VND: nhận "450000", "450.000" hoặc "450,000"; để trống nếu chưa có giá. */
+const price = blank(
+  z
+    .string()
+    .trim()
+    .transform((v, ctx) => {
+      if (v === "") return "";
+      const digits = v.replace(/[.,\s]/g, "");
+      if (!/^\d{1,9}$/.test(digits) || Number(digits) < 1000) {
+        ctx.addIssue({ code: "custom", message: "Nhập giá bằng số, ví dụ 450000" });
+        return z.NEVER;
+      }
+      return String(Number(digits));
+    }),
+);
 
 const optionalHttps = blank(z.union([z.literal(""), z.url({ protocol: /^https$/, error: "Cần đường dẫn https" })]));
 
@@ -191,6 +218,25 @@ export const settingsSchema = z.object({
       }),
   ),
   service_area: blank(z.string().trim().max(120, "Tối đa 120 ký tự")),
+  price_full_box: price,
+  price_tag_only: price,
+  bank_bin: blank(z.union([z.literal(""), z.string().regex(/^\d{6}$/, "Chọn ngân hàng")])),
+  bank_account: blank(
+    z.union([z.literal(""), z.string().trim().regex(/^\d{6,19}$/, "Số tài khoản gồm 6 đến 19 chữ số")]),
+  ),
+  bank_account_name: blank(
+    z
+      .string()
+      .trim()
+      .max(50, "Tối đa 50 ký tự")
+      .transform((v) =>
+        v
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/gi, "D")
+          .toUpperCase(),
+      ),
+  ),
 });
 
 /** Chuyển FormData thành object; các khóa trong `booleans` thành true khi ô được chọn. */
@@ -208,3 +254,32 @@ export type FieldErrors = Record<string, string[] | undefined>;
 export function fieldErrors(error: z.ZodError): FieldErrors {
   return z.flattenError(error).fieldErrors as FieldErrors;
 }
+
+/** Form đặt hàng online của khách (trang /dat-hang). */
+export const orderRequestSchema = z
+  .object({
+    package: z.enum(["full_box", "tag_only"], "Chọn gói sản phẩm"),
+    customerName: requiredText(2, 80, "Họ tên"),
+    phone: phone(true),
+    email: blank(
+      z
+        .string()
+        .trim()
+        .toLowerCase()
+        .refine((v) => v === "" || z.email().safeParse(v).success, "Email không hợp lệ")
+        .transform((v) => v || null),
+    ),
+    address: requiredText(5, 200, "Địa chỉ nhận hàng"),
+    petName: requiredText(1, 50, "Tên bé"),
+    species: z.enum(["dog", "cat", "other"], "Chọn loài"),
+    breed: optionalText(50),
+    gender: z.enum(["male", "female", "unknown"]).catch("unknown"),
+    lifeStatus: z.enum(["alive", "memorial"]).catch("alive"),
+    birthDate: optionalPastDate,
+    passedDate: optionalPastDate,
+    note: optionalText(1000),
+    agree: z.literal(true, "Vui lòng đồng ý với chính sách bảo mật"),
+  })
+  .superRefine(checkPassedDate);
+
+export type OrderRequestInput = z.infer<typeof orderRequestSchema>;

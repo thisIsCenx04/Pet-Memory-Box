@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { changePassword, login, logout, requireAdmin } from "@/lib/auth";
+import { requirePetEditor } from "@/lib/owner-auth";
 import { db } from "@/lib/db";
 import { ConflictError, NotFoundError } from "@/lib/errors";
 import { saveSiteSettings, updateOrder } from "@/lib/services/admin-data";
+import { addMemory, addVideoLink, deleteMemory, moveMemory, updateMemory } from "@/lib/services/content";
 import { attachCoverFromTmp } from "@/lib/services/media";
 import { createPet, setArchived, setLifeStatus, setVisibility, updatePet } from "@/lib/services/pets";
 import { lockTag, reissueTag, unlockTag } from "@/lib/services/qr";
@@ -23,7 +25,6 @@ import {
   visibilitySchema,
   type FieldErrors,
 } from "@/lib/validation";
-import { parseVideoLink } from "@/lib/video-links";
 
 // Mọi Server Action là một endpoint công khai: luôn gọi requireAdmin() trước (BR-08).
 
@@ -48,6 +49,17 @@ function failure(e: unknown): ActionState {
 }
 
 const petPath = (id: string) => `/admin/pets/${id}`;
+
+/** Trang admin và trang chủ nuôi của cùng một hồ sơ. */
+function refreshPet(id: string) {
+  revalidatePath(petPath(id));
+  revalidatePath(`/chu-nuoi/${id}`);
+}
+
+async function assertTagOfPet(qrId: string, petId: string) {
+  const tag = await db.qrTag.findFirst({ where: { id: qrId, petId }, select: { id: true } });
+  if (!tag) throw new NotFoundError("Mã không thuộc hồ sơ này");
+}
 
 // ---------- Xác thực ----------
 
@@ -142,15 +154,15 @@ export async function updatePetAction(petId: string, _prev: ActionState, fd: For
 }
 
 export async function saveVisibilityAction(petId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const admin = await requireAdmin();
+  const actor = await requirePetEditor(petId);
   const parsed = visibilitySchema.safeParse(formToObject(fd, VISIBILITY_KEYS));
   if (!parsed.success) return { ok: false, message: "Cấu hình không hợp lệ" };
   try {
-    await setVisibility(petId, parsed.data, admin.id);
+    await setVisibility(petId, parsed.data, actor);
   } catch (e) {
     return failure(e);
   }
-  revalidatePath(petPath(petId));
+  refreshPet(petId);
   return { ok: true, message: "Đã lưu cấu hình hiển thị. Trang công khai cập nhật ngay." };
 }
 
@@ -189,26 +201,28 @@ export async function lifeStatusAction(petId: string, _prev: ActionState, fd: Fo
 // ---------- Mã QR ----------
 
 export async function lockTagAction(qrId: string, petId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const admin = await requireAdmin();
+  const actor = await requirePetEditor(petId);
   const parsed = lockSchema.safeParse(formToObject(fd));
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
   try {
-    await lockTag(qrId, parsed.data.reason, admin.id);
+    await assertTagOfPet(qrId, petId);
+    await lockTag(qrId, parsed.data.reason, actor);
   } catch (e) {
     return failure(e);
   }
-  revalidatePath(petPath(petId));
+  refreshPet(petId);
   return { ok: true, message: "Đã khóa mã. Quét mã sẽ không còn thấy thông tin của bé." };
 }
 
 export async function unlockTagAction(qrId: string, petId: string): Promise<ActionState> {
-  const admin = await requireAdmin();
+  const actor = await requirePetEditor(petId);
   try {
-    await unlockTag(qrId, admin.id);
+    await assertTagOfPet(qrId, petId);
+    await unlockTag(qrId, actor);
   } catch (e) {
     return failure(e);
   }
-  revalidatePath(petPath(petId));
+  refreshPet(petId);
   return { ok: true, message: "Đã mở khóa mã." };
 }
 
@@ -251,51 +265,54 @@ export async function updateOrderAction(orderId: string, _prev: ActionState, fd:
 // ---------- Kỷ niệm và link video ----------
 
 export async function addMemoryAction(petId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  await requireAdmin();
+  const actor = await requirePetEditor(petId);
   const parsed = memorySchema.safeParse(formToObject(fd));
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error), values: rawValues(fd) };
-  const last = await db.memory.aggregate({ where: { petId }, _max: { sortOrder: true } });
-  await db.memory.create({
-    data: { petId, ...parsed.data, sortOrder: (last._max.sortOrder ?? -1) + 1 },
-  });
-  revalidatePath(petPath(petId));
+  await addMemory(petId, parsed.data, actor);
+  refreshPet(petId);
   return { ok: true, message: "Đã thêm kỷ niệm." };
 }
 
+export async function updateMemoryAction(
+  memoryId: string,
+  petId: string,
+  _prev: ActionState,
+  fd: FormData,
+): Promise<ActionState> {
+  await requirePetEditor(petId);
+  const parsed = memorySchema.safeParse(formToObject(fd));
+  if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error), values: rawValues(fd) };
+  try {
+    await updateMemory(petId, memoryId, parsed.data);
+  } catch (e) {
+    return failure(e);
+  }
+  refreshPet(petId);
+  return { ok: true, message: "Đã lưu kỷ niệm." };
+}
+
 export async function deleteMemoryAction(memoryId: string, petId: string): Promise<ActionState> {
-  await requireAdmin();
-  await db.memory.deleteMany({ where: { id: memoryId, petId } });
-  revalidatePath(petPath(petId));
+  await deleteMemory(petId, memoryId, await requirePetEditor(petId));
+  refreshPet(petId);
   return { ok: true, message: "Đã xóa kỷ niệm." };
 }
 
 export async function moveMemoryAction(memoryId: string, petId: string, direction: -1 | 1): Promise<void> {
-  await requireAdmin();
-  const list = await db.memory.findMany({ where: { petId }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
-  const i = list.findIndex((m) => m.id === memoryId);
-  const j = i + direction;
-  if (i < 0 || j < 0 || j >= list.length) return;
-  [list[i], list[j]] = [list[j], list[i]];
-  await db.$transaction(list.map((m, idx) => db.memory.update({ where: { id: m.id }, data: { sortOrder: idx } })));
-  revalidatePath(petPath(petId));
+  await requirePetEditor(petId);
+  await moveMemory(petId, memoryId, direction === -1 ? -1 : 1);
+  refreshPet(petId);
 }
 
 export async function addVideoLinkAction(petId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const link = parseVideoLink(String(fd.get("url") ?? ""));
+  await requirePetEditor(petId);
   const title = String(fd.get("title") ?? "").trim().slice(0, 100) || null;
-  if (!link) {
-    return {
-      ok: false,
-      errors: { url: ["Chỉ nhận liên kết https từ youtube.com, youtu.be hoặc vimeo.com"] },
-      values: rawValues(fd),
-    };
+  try {
+    await addVideoLink(petId, String(fd.get("url") ?? ""), title);
+  } catch (e) {
+    if (e instanceof ConflictError) return { ok: false, errors: { url: [e.message] }, values: rawValues(fd) };
+    return failure(e);
   }
-  const last = await db.video.aggregate({ where: { petId }, _max: { sortOrder: true } });
-  await db.video.create({
-    data: { petId, source: link.source, url: link.embedUrl, title, sortOrder: (last._max.sortOrder ?? -1) + 1 },
-  });
-  revalidatePath(petPath(petId));
+  refreshPet(petId);
   return { ok: true, message: "Đã thêm video." };
 }
 

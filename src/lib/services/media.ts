@@ -17,7 +17,7 @@ import {
   mimeFromKey,
 } from "../media-rules";
 import { storage, type UploadTarget } from "../storage";
-import { audit } from "./audit";
+import { audit, type Actor } from "./audit";
 
 // UC-12, UC-13: ảnh và video của hồ sơ. Tệp đi thẳng từ trình duyệt lên kho;
 // máy chủ chỉ cấp URL có chữ ký rồi kiểm tra tệp đã nằm trên kho trước khi ghi bản ghi.
@@ -77,7 +77,7 @@ export async function requestPhotoUploads(petId: string, items: PhotoUploadReque
 
 export type ConfirmPhoto = { key: string; thumbKey: string; width?: number; height?: number; caption?: string | null };
 
-export async function confirmPhoto(petId: string, input: ConfirmPhoto, adminId: string) {
+export async function confirmPhoto(petId: string, input: ConfirmPhoto, actor: Actor) {
   const prefix = `pets/${petId}/photos/`;
   const keyRe = new RegExp(`^${prefix}(${UUID})\\.(jpg|png|webp)$`);
   const m = keyRe.exec(input.key);
@@ -116,7 +116,7 @@ export async function confirmPhoto(petId: string, input: ConfirmPhoto, adminId: 
         isCover: !cover, // ảnh đầu tiên tự làm ảnh đại diện
       },
     });
-    await audit(tx, adminId, "update", "pet", petId, "thêm ảnh");
+    await audit(tx, actor, "update", "pet", petId, "thêm ảnh");
     return asset;
   });
 }
@@ -148,7 +148,7 @@ export async function reorderPhotos(petId: string, orderedIds: string[]) {
   await db.$transaction(ids.map((id, i) => db.mediaAsset.update({ where: { id }, data: { sortOrder: i } })));
 }
 
-export async function deletePhoto(petId: string, photoId: string, adminId: string) {
+export async function deletePhoto(petId: string, photoId: string, actor: Actor) {
   const photo = await db.$transaction(async (tx) => {
     const p = await tx.mediaAsset.findFirst({ where: { id: photoId, petId } });
     if (!p) throw new NotFoundError("Ảnh không tồn tại");
@@ -157,7 +157,7 @@ export async function deletePhoto(petId: string, photoId: string, adminId: strin
       const next = await tx.mediaAsset.findFirst({ where: { petId }, orderBy: { sortOrder: "asc" } });
       if (next) await tx.mediaAsset.update({ where: { id: next.id }, data: { isCover: true } });
     }
-    await audit(tx, adminId, "update", "pet", petId, "xóa ảnh");
+    await audit(tx, actor, "update", "pet", petId, "xóa ảnh");
     return p;
   });
   await removeQuietly([photo.storageKey, photo.thumbKey]);
@@ -237,7 +237,7 @@ export async function requestVideoUpload(petId: string, it: VideoUploadRequest) 
 export async function confirmVideo(
   petId: string,
   input: { key: string; posterKey: string; durationSec: number; title?: string | null },
-  adminId: string,
+  actor: Actor,
 ) {
   const prefix = `pets/${petId}/videos/`;
   const m = new RegExp(`^${prefix}(${UUID})\\.(mp4|webm)$`).exec(input.key);
@@ -271,17 +271,17 @@ export async function confirmVideo(
         sortOrder: (last._max.sortOrder ?? -1) + 1,
       },
     });
-    await audit(tx, adminId, "update", "pet", petId, "thêm video");
+    await audit(tx, actor, "update", "pet", petId, "thêm video");
     return video;
   });
 }
 
-export async function deleteVideo(petId: string, videoId: string, adminId: string) {
+export async function deleteVideo(petId: string, videoId: string, actor: Actor) {
   const video = await db.$transaction(async (tx) => {
     const v = await tx.video.findFirst({ where: { id: videoId, petId } });
     if (!v) throw new NotFoundError("Video không tồn tại");
     await tx.video.delete({ where: { id: videoId } });
-    await audit(tx, adminId, "update", "pet", petId, "xóa video");
+    await audit(tx, actor, "update", "pet", petId, "xóa video");
     return v;
   });
   await removeQuietly([video.storageKey, video.posterKey]);

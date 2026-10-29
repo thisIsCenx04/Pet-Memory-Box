@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       },
       {
         // Trang công khai của bé và khu quản trị không được lập chỉ mục (FR-32)
-        source: "/(p|admin|api)/:path*",
+        source: "/(p|admin|api|chu-nuoi|dat-hang)/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];

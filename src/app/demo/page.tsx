@@ -37,6 +37,7 @@ const DEMO: PublicProfile = {
     },
   ],
   contact: { callButton: true, phone: "0900000000", area: "Phường Bến Nghé, Quận 1, TP.HCM" },
+  guestbookOpen: false,
 };
 
 export default function DemoPage() {

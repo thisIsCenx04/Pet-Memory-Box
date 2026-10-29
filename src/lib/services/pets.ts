@@ -6,7 +6,7 @@ import { ConflictError, NotFoundError, isUniqueViolation } from "../errors";
 import { normalizeVnPhone } from "../phone";
 import { formatCardNo, generatePublicToken } from "../tokens";
 import type { CreatePetInput, UpdatePetInput, Visibility } from "../validation";
-import { audit } from "./audit";
+import { audit, type Actor } from "./audit";
 
 export const PAGE_SIZE = 20; // FR-12
 
@@ -44,6 +44,7 @@ export async function createPet(input: CreatePetInput, adminId: string): Promise
             zaloMessenger: input.zaloMessenger,
             area: input.area,
             address: input.address,
+            email: input.ownerEmail,
           },
         });
 
@@ -88,6 +89,7 @@ function pickVisibility(v: Visibility): Visibility {
     showNote: v.showNote,
     showMedia: v.showMedia,
     showMemories: v.showMemories,
+    showGuestbook: v.showGuestbook,
   };
 }
 
@@ -207,6 +209,7 @@ export async function updatePet(id: string, input: UpdatePetInput, adminId: stri
         zaloMessenger: input.zaloMessenger,
         area: input.area,
         address: input.address,
+        email: input.ownerEmail,
       },
     });
     await audit(tx, adminId, "update", "pet", id);
@@ -214,12 +217,12 @@ export async function updatePet(id: string, input: UpdatePetInput, adminId: stri
 }
 
 /** UC-10 */
-export async function setVisibility(id: string, v: Visibility, adminId: string) {
+export async function setVisibility(id: string, v: Visibility, actor: Actor) {
   await db.$transaction(async (tx) => {
     await petOrThrow(tx, id);
     const data = pickVisibility(v);
     await tx.visibilitySettings.upsert({ where: { petId: id }, update: data, create: { petId: id, ...data } });
-    await audit(tx, adminId, "update", "pet", id, "visibility");
+    await audit(tx, actor, "update", "pet", id, "visibility");
   });
 }
 

@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </div>
         <div className="card p-6 sm:p-8">
           <h1 className="text-2xl font-bold">Đăng nhập quản trị</h1>
-          <p className="mt-1 mb-6 text-sm text-ink-soft">Chỉ dành cho nhân sự vận hành Pet Memory Box.</p>
+          <p className="mt-1 mb-6 text-sm text-ink-soft">Chỉ dành cho nhân sự vận hành Furever.</p>
           <LoginForm next={next ?? ""} />
         </div>
       </div>

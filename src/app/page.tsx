@@ -196,9 +196,9 @@ export default async function LandingPage() {
                 className="animate-rise mt-8 flex flex-wrap gap-3"
                 style={{ "--rise-delay": "270ms" } as React.CSSProperties}
               >
-                <a href="#lien-he" className="btn-primary min-h-12 px-6 text-base">
+                <Link href="/dat-hang" className="btn-primary min-h-12 px-6 text-base">
                   Đặt hộp cho bé
-                </a>
+                </Link>
                 <Link href="/demo" className="btn-outline min-h-12 px-6 text-base">
                   Xem trang Digital Memory mẫu
                 </Link>
@@ -330,25 +330,28 @@ export default async function LandingPage() {
         <section id="lien-he" className="scroll-mt-20 bg-peach-soft">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 md:grid-cols-2">
             <Reveal>
-              <h2 className="text-4xl font-bold sm:text-5xl">Bắt đầu bằng một tin nhắn.</h2>
+              <h2 className="text-4xl font-bold sm:text-5xl">Đặt hộp cho bé.</h2>
               <p className="mt-4 max-w-md text-ink-soft">
-                Gửi ảnh và thông tin của bé cho admin. Admin nhập hồ sơ, phát hành mã QR và báo bạn khi hộp kỷ vật sẵn
-                sàng.
+                Đặt online và thanh toán bằng mã VietQR, hoặc nhắn tin để được tư vấn. Sau đó gửi ảnh, video và câu chuyện
+                của bé, Furever lo phần còn lại.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/dat-hang" className="btn-primary min-h-12 px-6 text-base">
+                  Đặt hàng online
+                </Link>
                 {settings.zalo_url ? (
-                  <a href={settings.zalo_url} target="_blank" rel="noopener" className="btn-primary min-h-12 px-6 text-base">
+                  <a href={settings.zalo_url} target="_blank" rel="noopener" className="btn-outline min-h-12 px-6 text-base">
                     Nhắn qua Zalo
                   </a>
                 ) : null}
-                {settings.messenger_url ? (
+                {settings.messenger_url || settings.facebook_url ? (
                   <a
-                    href={settings.messenger_url}
+                    href={settings.messenger_url || settings.facebook_url}
                     target="_blank"
                     rel="noopener"
                     className="btn-outline min-h-12 px-6 text-base"
                   >
-                    Nhắn qua Messenger
+                    Nhắn qua Facebook
                   </a>
                 ) : null}
                 {settings.hotline ? (

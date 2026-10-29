@@ -13,6 +13,7 @@ const GROUPS = [
       { href: "/admin/pets", label: "Hồ sơ thú cưng", exclude: "/admin/pets/new" },
       { href: "/admin/pets/new", label: "Đăng ký mới" },
       { href: "/admin/qr", label: "Mã QR đã phát hành" },
+      { href: "/admin/don-online", label: "Đơn đặt online" },
       { href: "/admin/orders", label: "Đơn hàng hộp kỷ vật" },
     ],
   },
@@ -38,8 +39,7 @@ export function Sidebar({ email }: { email: string }) {
   return (
     <aside className="flex w-full shrink-0 flex-col border-sand bg-paper lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:border-r">
       <div className="px-6 pt-6 pb-2">
-        <Wordmark />
-        <p className="mt-1 pl-7 text-xs text-ink-soft">Quản trị</p>
+        <Wordmark sub="QUẢN TRỊ" />
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Điều hướng quản trị">
         {GROUPS.map((group) => (

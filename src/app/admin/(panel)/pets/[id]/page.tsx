@@ -29,6 +29,9 @@ import {
   formatDateTime,
   toDateInput,
 } from "@/lib/format";
+import { FoundReports, ScanList } from "@/components/owner/activity";
+import { GuestbookModeration } from "@/components/owner/guestbook-moderation";
+import { listFoundReports, listGuestbook, recentScans } from "@/lib/services/community";
 import { videoMaxBytes } from "@/lib/services/media";
 import { getPetDetail } from "@/lib/services/pets";
 import { renderQrDataUrl } from "@/lib/services/qr";
@@ -41,6 +44,7 @@ const TABS = [
   { key: "photos", label: "Ảnh" },
   { key: "videos", label: "Video" },
   { key: "memories", label: "Kỷ niệm" },
+  { key: "community", label: "Báo tìm & lưu bút" },
   { key: "qr", label: "Mã QR và đơn hàng" },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
@@ -165,6 +169,7 @@ export default async function PetDetailPage({
                   zaloMessenger: pet.owner.zaloMessenger ?? "",
                   area: pet.owner.area ?? "",
                   address: pet.owner.address ?? "",
+                  ownerEmail: pet.owner.email ?? "",
                 }}
               />
             </Section>
@@ -187,6 +192,7 @@ export default async function PetDetailPage({
                   showNote: pet.visibility?.showNote ?? false,
                   showMedia: pet.visibility?.showMedia ?? false,
                   showMemories: pet.visibility?.showMemories ?? false,
+                  showGuestbook: pet.visibility?.showGuestbook ?? false,
                 }}
               />
             </Section>
@@ -228,6 +234,10 @@ export default async function PetDetailPage({
                 <VideoLinkForm action={addVideoLinkAction.bind(null, pet.id)} />
               </Section>
             </>
+          ) : null}
+
+          {tab === "community" ? (
+            <CommunityTab petId={pet.id} memorial={pet.lifeStatus === "memorial"} />
           ) : null}
 
           {tab === "memories" ? (
@@ -297,7 +307,7 @@ export default async function PetDetailPage({
                         <span className="w-36 text-ink-soft">{formatDateTime(h.createdAt)}</span>
                         <span className="font-semibold">{ACTION_LABEL[h.action] ?? h.action}</span>
                         {h.detail ? <span className="text-ink-soft">{DETAIL_LABEL[h.detail] ?? h.detail}</span> : null}
-                        <span className="ml-auto text-xs text-ink-soft">{h.admin.email}</span>
+                        <span className="ml-auto text-xs text-ink-soft">{h.admin?.email ?? `Chủ nuôi ${h.actorEmail ?? ""}`}</span>
                       </li>
                     ))}
                   </ul>
@@ -404,6 +414,35 @@ export default async function PetDetailPage({
           </div>
         </aside>
       </div>
+    </>
+  );
+}
+
+async function CommunityTab({ petId, memorial }: { petId: string; memorial: boolean }) {
+  const [reports, scans, guestbook] = await Promise.all([listFoundReports(petId), recentScans(petId), listGuestbook(petId)]);
+  return (
+    <>
+      <Section title="Người nhặt được bé gửi về">
+        <FoundReports reports={reports} />
+      </Section>
+      <Section title="Lượt quét 30 ngày">
+        <ScanList scans={scans.scans} count7d={scans.count7d} />
+      </Section>
+      <Section
+        title="Sổ lưu bút"
+        description={memorial ? "Lời nhắn chỉ hiện trên trang sau khi được duyệt." : "Sổ lưu bút chỉ mở khi hồ sơ ở chế độ tưởng niệm."}
+      >
+        <GuestbookModeration
+          petId={petId}
+          entries={guestbook.map((g) => ({
+            id: g.id,
+            authorName: g.authorName,
+            message: g.message,
+            status: g.status,
+            createdAt: g.createdAt.toISOString(),
+          }))}
+        />
+      </Section>
     </>
   );
 }
