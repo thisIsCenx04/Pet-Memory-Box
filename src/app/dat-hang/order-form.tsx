@@ -133,7 +133,7 @@ export function OrderForm({ pricing }: { pricing: { full_box: number | null; tag
           <Field label="Địa chỉ nhận hàng *" htmlFor="address" error={e.address} className="sm:col-span-2">
             <input id="address" name="address" maxLength={200} autoComplete="street-address" className="input" defaultValue={v.address} />
           </Field>
-          <Field label="Ghi chú cho Furever" htmlFor="note" error={e.note} className="sm:col-span-2">
+          <Field label="Ghi chú cho bọn tớ" htmlFor="note" error={e.note} className="sm:col-span-2">
             <textarea id="note" name="note" rows={3} maxLength={1000} className="input" defaultValue={v.note} />
           </Field>
           <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
@@ -147,7 +147,7 @@ export function OrderForm({ pricing }: { pricing: { full_box: number | null; tag
         <div className="card p-5">
           <p className="eyebrow">Tạm tính</p>
           <p className="mt-1 font-heading text-3xl font-bold">{amount ? vnd(amount) : "Chọn gói"}</p>
-          <p className="mt-2 text-xs text-ink-soft">Phí giao hàng (nếu có) Furever sẽ báo khi xác nhận đơn.</p>
+          <p className="mt-2 text-xs text-ink-soft">Phí giao hàng (nếu có) bọn tớ sẽ báo khi xác nhận đơn.</p>
           <label className="mt-4 flex items-start gap-2 text-sm">
             <input type="checkbox" name="agree" defaultChecked={v.agree === "on"} className="mt-1 accent-sage" />
             <span>

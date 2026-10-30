@@ -24,7 +24,7 @@ const FEATURES = [
 
 const STEPS = [
   ["Chuẩn bị kỷ vật", "Gom ảnh, video, lông, dấu chân hay chiếc vòng cổ cũ của bé."],
-  ["Nhắn cho admin", "Gửi ảnh và thông tin qua Zalo hoặc Messenger. Admin nhập hồ sơ và phát hành mã QR."],
+  ["Nhắn cho bọn tớ", "Gửi ảnh và thông tin qua Zalo hoặc Messenger. Bọn tớ sẽ tạo hồ sơ và phát hành mã QR."],
   ["Nhận hộp kỷ vật", "Kỷ vật được sắp vào hộp thiếc cùng thẻ căn cước và vòng cổ đã in mã."],
   ["Quét để nhớ", "Mỗi lần quét mã là một lần gặp lại bé, ở bất cứ đâu."],
 ] as const;
@@ -49,8 +49,8 @@ const FAQ = [
     "Thông tin của tôi có bị công khai không?",
     "Mỗi bé có một đường dẫn riêng khó đoán, không xuất hiện ở trang chủ hay công cụ tìm kiếm. Người quét mã chỉ thấy các mục bạn đã đồng ý hiển thị.",
   ],
-  ["Nếu làm mất vòng cổ thì sao?", "Nhắn cho admin để khóa mã cũ ngay và phát hành mã mới cho bé."],
-  ["Tôi có thể chỉ đặt vòng cổ QR không?", "Có. Nhắn cho admin để được tư vấn gói chỉ vòng cổ QR và giá hiện tại."],
+  ["Nếu làm mất vòng cổ thì sao?", "Nhắn cho bọn tớ để khóa mã cũ ngay và phát hành mã mới cho bé."],
+  ["Tôi có thể chỉ đặt vòng cổ QR không?", "Có. Nhắn cho bọn tớ để được tư vấn gói chỉ vòng cổ QR và giá hiện tại."],
 ] as const;
 
 const PREPARE = [
@@ -273,7 +273,7 @@ export default async function LandingPage() {
         {/* Cách hoạt động */}
         <section id="cach-hoat-dong" className="scroll-mt-20 mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <SectionTitle eyebrow="Cách hoạt động" title="Bốn bước để giữ lại những điều yêu thương.">
-            Bạn chỉ cần nhắn tin gửi ảnh và thông tin của bé. Admin nhập hồ sơ, phát hành mã QR và lo phần còn lại.
+            Bạn chỉ cần nhắn tin gửi ảnh và thông tin của bé. Bọn tớ sẽ tạo hồ sơ, phát hành mã QR và lo phần còn lại.
           </SectionTitle>
           <ol className="relative mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <span

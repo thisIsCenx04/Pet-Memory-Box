@@ -55,10 +55,10 @@ export async function createOrderRequest(input: OrderRequestInput, ipHash: strin
   const recent = await db.orderRequest.count({
     where: { ipHash, createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) } },
   });
-  if (recent >= ORDERS_PER_HOUR) throw new ConflictError("Bạn đã đặt nhiều đơn trong một giờ. Vui lòng nhắn Furever để được hỗ trợ.");
+  if (recent >= ORDERS_PER_HOUR) throw new ConflictError("Bạn đã đặt nhiều đơn trong một giờ. Bạn nhắn cho bọn tớ để được hỗ trợ nhé.");
   const pricing = await getPricing();
   const amount = pricing[input.package];
-  if (!amount) throw new ConflictError("Gói này chưa mở bán online, vui lòng nhắn Furever.");
+  if (!amount) throw new ConflictError("Gói này chưa mở bán online, bạn nhắn cho bọn tớ nhé.");
 
   for (let attempt = 1; ; attempt++) {
     try {
@@ -105,12 +105,12 @@ async function notifyOrderCreated(code: string, token: string) {
       to: order.email,
       subject: `Furever đã nhận đơn ${code}`,
       text:
-        `Chào ${order.customerName},\n\nFurever đã nhận đơn ${PACKAGE_LABEL[order.package]} cho bé ${order.petName}.\n` +
+        `Chào ${order.customerName},\n\nBọn tớ đã nhận đơn ${PACKAGE_LABEL[order.package]} cho bé ${order.petName}.\n` +
         (order.amount ? `Số tiền: ${formatVnd(order.amount)}\n` : "") +
         (account
           ? `Chuyển khoản tới ${account.bankName} ${account.accountNumber} (${account.accountName}), nội dung: ${transferContent(code)}\n`
           : "") +
-        `\nMã QR thanh toán và trạng thái đơn: ${link}\n\nSau khi nhận thanh toán, Furever sẽ liên hệ để nhận ảnh và kỷ vật của bé.`,
+        `\nMã QR thanh toán và trạng thái đơn: ${link}\n\nSau khi nhận thanh toán, bọn tớ sẽ liên hệ để nhận ảnh và kỷ vật của bé.`,
     });
   }
   if (account?.contactEmail) {
@@ -174,8 +174,8 @@ export async function markOrderPaid(id: string, adminId: string) {
       to: order.email,
       subject: `Furever đã nhận thanh toán đơn ${order.code}`,
       text:
-        `Chào ${order.customerName},\n\nFurever đã nhận được thanh toán cho đơn ${order.code}. Cảm ơn bạn!\n\n` +
-        `Bước tiếp theo: gửi ảnh, video và câu chuyện của ${order.petName} qua Zalo hoặc Messenger của Furever. ` +
+        `Chào ${order.customerName},\n\nBọn tớ đã nhận được thanh toán cho đơn ${order.code}. Cảm ơn bạn!\n\n` +
+        `Bước tiếp theo: gửi ảnh, video và câu chuyện của ${order.petName} cho bọn tớ qua Zalo hoặc Facebook. ` +
         `Khi hồ sơ của bé được tạo, bạn có thể đăng nhập bằng chính email này tại ${siteUrl()}/chu-nuoi/dang-nhap để tự thêm ảnh và kỷ niệm.\n\n` +
         `Trạng thái đơn: ${orderUrl(order.code, order.accessToken)}`,
     });

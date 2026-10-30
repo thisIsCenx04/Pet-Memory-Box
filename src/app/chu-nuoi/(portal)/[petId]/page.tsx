@@ -85,7 +85,7 @@ export default async function OwnerPetPage({
       </div>
 
       {readOnly ? (
-        <p className="mt-4 rounded-xl bg-sand px-4 py-3 text-sm">Hồ sơ đang được lưu trữ nên chỉ xem được. Nhắn Furever để mở lại.</p>
+        <p className="mt-4 rounded-xl bg-sand px-4 py-3 text-sm">Hồ sơ đang được lưu trữ nên chỉ xem được. Nhắn cho bọn tớ để mở lại.</p>
       ) : null}
 
       <nav className="mt-6 mb-6 flex gap-1 overflow-x-auto border-b border-sand" aria-label="Mục hồ sơ">
@@ -132,7 +132,7 @@ export default async function OwnerPetPage({
                       Mở khóa mã
                     </ConfirmButton>
                   )}
-                  <p className="text-xs text-ink-soft">Cần in vòng mới với mã khác, hãy nhắn cho Furever.</p>
+                  <p className="text-xs text-ink-soft">Cần in vòng mới với mã khác, hãy nhắn cho bọn tớ.</p>
                 </div>
               ) : (
                 <p className="text-sm text-ink-soft">Hồ sơ chưa có mã.</p>

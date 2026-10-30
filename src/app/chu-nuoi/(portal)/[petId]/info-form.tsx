@@ -36,7 +36,7 @@ export function PublicInfoForm({
         <textarea id="note" name="note" rows={4} maxLength={1000} className="input" defaultValue={defaults.note} />
       </Field>
       <SubmitButton>Lưu</SubmitButton>
-      <p className="text-xs text-ink-soft">Muốn đổi tên bé, số điện thoại hay địa chỉ, hãy nhắn cho Furever.</p>
+      <p className="text-xs text-ink-soft">Muốn đổi tên bé, số điện thoại hay địa chỉ, hãy nhắn cho bọn tớ.</p>
     </form>
   );
 }

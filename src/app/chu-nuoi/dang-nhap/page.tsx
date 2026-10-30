@@ -19,7 +19,7 @@ export default async function OwnerLoginPage() {
         <div className="card animate-rise p-6 sm:p-8">
           <h1 className="text-2xl font-bold">Trang của chủ nuôi</h1>
           <p className="mt-1 mb-6 text-sm text-ink-soft">
-            Đăng nhập bằng email bạn đã gửi cho Furever khi đặt hộp. Không cần mật khẩu, chúng mình sẽ gửi mã 6 số.
+            Đăng nhập bằng email bạn đã gửi cho bọn tớ khi đặt hộp. Không cần mật khẩu, bọn tớ sẽ gửi mã 6 số.
           </p>
           <OtpForm />
         </div>

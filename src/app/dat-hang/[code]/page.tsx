@@ -37,7 +37,7 @@ export default async function OrderStatusPage({
         <Wordmark />
       </Link>
       <h1 className="animate-rise mt-8 text-3xl font-bold sm:text-4xl">
-        {pending ? "Thanh toán đơn hàng" : order.status === "cancelled" ? "Đơn đã hủy" : "Furever đã nhận thanh toán"}
+        {pending ? "Thanh toán đơn hàng" : order.status === "cancelled" ? "Đơn đã hủy" : "Bọn tớ đã nhận thanh toán"}
       </h1>
       <p className="mt-2 text-ink-soft">
         Mã đơn <strong className="font-mono text-ink">{order.code}</strong> · {PACKAGE_LABEL[order.package]} cho bé{" "}
@@ -56,7 +56,7 @@ export default async function OrderStatusPage({
                 </p>
               </>
             ) : (
-              <p className="text-sm text-ink-soft">Furever chưa cài tài khoản nhận tiền, vui lòng nhắn để được hướng dẫn.</p>
+              <p className="text-sm text-ink-soft">Bọn tớ chưa cài tài khoản nhận tiền, bạn nhắn để được hướng dẫn nhé.</p>
             )}
           </div>
           <div className="card space-y-4 p-5">
@@ -70,7 +70,7 @@ export default async function OrderStatusPage({
               </dl>
             ) : null}
             <p className="rounded-xl bg-peach-soft px-4 py-3 text-sm text-rust">
-              Ghi đúng nội dung <strong>{content}</strong> để Furever đối chiếu nhanh. Trang này tự cập nhật khi Furever xác nhận đã
+              Ghi đúng nội dung <strong>{content}</strong> để bọn tớ đối chiếu nhanh. Trang này tự cập nhật khi bọn tớ xác nhận đã
               nhận tiền.
             </p>
             <StatusPoller />
@@ -82,8 +82,8 @@ export default async function OrderStatusPage({
         <div className="card mt-8 space-y-3 p-6">
           <p>Cảm ơn bạn! Bước tiếp theo:</p>
           <ol className="list-decimal space-y-2 pl-5 text-sm">
-            <li>Gửi ảnh, video và câu chuyện của {order.petName} cho Furever qua Zalo hoặc Facebook.</li>
-            <li>Furever làm hộp, in mã QR lên vòng cổ và báo bạn khi giao hàng.</li>
+            <li>Gửi ảnh, video và câu chuyện của {order.petName} cho bọn tớ qua Zalo hoặc Facebook.</li>
+            <li>Bọn tớ làm hộp, in mã QR lên vòng cổ và báo bạn khi giao hàng.</li>
             {order.email ? (
               <li>
                 Khi hồ sơ của bé được tạo, bạn đăng nhập bằng {order.email} ở{" "}

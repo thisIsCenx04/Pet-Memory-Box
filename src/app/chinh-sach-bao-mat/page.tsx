@@ -12,11 +12,11 @@ export const dynamic = "force-dynamic";
 
 const SECTIONS: [string, string[]][] = [
   [
-    "Thông tin chúng mình lưu",
+    "Thông tin bọn tớ lưu",
     [
       "Thông tin của bé: tên, loài, giống, giới tính, ngày sinh, màu lông, đặc điểm nhận dạng, lưu ý sức khỏe, ảnh, video và câu chuyện bạn gửi.",
       "Thông tin của chủ nuôi: họ tên, số điện thoại, Zalo hoặc Messenger, khu vực và địa chỉ (nếu bạn cung cấp).",
-      "Khi có người mở trang của bé, hệ thống ghi thời điểm, kết quả và một giá trị băm của địa chỉ IP. Chúng mình không lưu địa chỉ IP gốc.",
+      "Khi có người mở trang của bé, hệ thống ghi thời điểm, kết quả và một giá trị băm của địa chỉ IP. Bọn tớ không lưu địa chỉ IP gốc.",
     ],
   ],
   [
@@ -30,16 +30,16 @@ const SECTIONS: [string, string[]][] = [
   [
     "Khi mất vòng cổ hoặc muốn ngừng hiển thị",
     [
-      "Nhắn cho admin để khóa mã. Mã bị khóa sẽ không còn hiển thị bất kỳ thông tin nào của bé hay của bạn.",
-      "Admin có thể phát hành mã mới cho vòng cổ mới; mã cũ ngừng hoạt động vĩnh viễn.",
+      "Nhắn cho bọn tớ để khóa mã. Mã bị khóa sẽ không còn hiển thị bất kỳ thông tin nào của bé hay của bạn.",
+      "Bọn tớ có thể phát hành mã mới cho vòng cổ mới; mã cũ ngừng hoạt động vĩnh viễn.",
       "Bạn có thể yêu cầu ẩn hồ sơ khỏi trang công khai hoặc sửa thông tin bất cứ lúc nào.",
     ],
   ],
   [
     "Bảo vệ dữ liệu",
     [
-      "Toàn bộ kết nối dùng HTTPS. Chỉ admin của Furever đăng nhập được vào trang quản trị.",
-      "Dữ liệu được lưu trên hạ tầng có sao lưu hằng ngày. Chúng mình không bán hay chia sẻ thông tin của bạn cho bên thứ ba.",
+      "Toàn bộ kết nối dùng HTTPS. Chỉ đội ngũ Furever đăng nhập được vào trang quản trị.",
+      "Dữ liệu được lưu trên hạ tầng có sao lưu hằng ngày. Bọn tớ không bán hay chia sẻ thông tin của bạn cho bên thứ ba.",
     ],
   ],
 ];
@@ -54,7 +54,7 @@ export default async function PrivacyPage() {
         <p className="eyebrow">Furever</p>
         <h1 className="animate-rise mt-2 text-4xl font-bold sm:text-5xl">Chính sách bảo mật</h1>
         <p className="mt-4 text-ink-soft">
-          Thông tin của bé và của bạn là những điều riêng tư. Trang này giải thích chúng mình lưu gì, hiển thị gì và bạn
+          Thông tin của bé và của bạn là những điều riêng tư. Trang này giải thích bọn tớ lưu gì, hiển thị gì và bạn
           kiểm soát những gì.
         </p>
         <div className="mt-10 space-y-10">
@@ -73,7 +73,7 @@ export default async function PrivacyPage() {
           ))}
         </div>
         <p className="mt-12 rounded-2xl bg-paper p-5 text-sm text-ink-soft">
-          Có câu hỏi về dữ liệu của bạn? Nhắn cho chúng mình qua các kênh ở chân trang.
+          Có câu hỏi về dữ liệu của bạn? Nhắn cho bọn tớ qua các kênh ở chân trang.
         </p>
       </main>
       <SiteFooter settings={settings} />

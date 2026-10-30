@@ -23,7 +23,7 @@ export default async function OrderPage() {
         <p className="eyebrow">Đặt hàng</p>
         <h1 className="animate-rise mt-2 text-4xl font-bold sm:text-5xl">Đặt hộp cho bé</h1>
         <p className="mt-3 max-w-2xl text-ink-soft">
-          Điền thông tin, thanh toán bằng mã VietQR, rồi gửi ảnh và kỷ vật của bé cho Furever qua Zalo hoặc Messenger. Furever
+          Điền thông tin, thanh toán bằng mã VietQR, rồi gửi ảnh và kỷ vật của bé cho bọn tớ qua Zalo hoặc Messenger. Bọn tớ
           tạo trang Digital Memory và báo bạn khi hộp sẵn sàng.
         </p>
         {open ? (
@@ -31,7 +31,7 @@ export default async function OrderPage() {
         ) : (
           <div className="card mt-8 p-6">
             <p className="font-semibold">Đặt hàng online đang tạm đóng.</p>
-            <p className="mt-1 text-sm text-ink-soft">Bạn nhắn cho Furever để được tư vấn gói và giá.</p>
+            <p className="mt-1 text-sm text-ink-soft">Bạn nhắn cho bọn tớ để được tư vấn gói và giá nhé.</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {settings.zalo_url ? (
                 <a href={settings.zalo_url} target="_blank" rel="noopener" className="btn-primary">

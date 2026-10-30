@@ -15,7 +15,7 @@ export default async function OwnerHome() {
       {pets.length === 0 ? (
         <div className="card mt-8 p-8 text-center">
           <p className="font-semibold">Chưa có bé nào gắn với email {owner.email}</p>
-          <p className="mt-1 text-sm text-ink-soft">Nhắn cho Furever để thêm email này vào hồ sơ của bé.</p>
+          <p className="mt-1 text-sm text-ink-soft">Nhắn cho bọn tớ để thêm email này vào hồ sơ của bé.</p>
         </div>
       ) : (
         <ul className="mt-8 grid gap-4 sm:grid-cols-2">
