@@ -1,4 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
+import banner from "@/assets/landing/furever-banner.webp";
+import idCard from "@/assets/landing/pet-id-card.webp";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -161,59 +164,51 @@ export default async function LandingPage() {
       <SiteHeader />
 
       <main>
-        {/* Hero: kéo lên nằm dưới header trong suốt để mảng màu nền phủ kín đầu trang */}
-        <section className="relative -mt-[76px] overflow-hidden pt-[76px]">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-40 -right-32 h-[30rem] w-[30rem] rounded-full bg-peach-soft blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute top-60 -left-40 h-80 w-80 rounded-full bg-sage-soft blur-3xl"
-          />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pt-8 pb-16 sm:px-6 md:grid-cols-[1.1fr_1fr] md:pt-14 md:pb-24">
-            <div>
-              <p className="animate-rise font-hand text-2xl text-rust">Giữ lại những điều yêu thương</p>
-              <h1
-                className="animate-rise mt-2 text-[2.6rem] leading-[1.08] font-bold sm:text-6xl"
-                style={{ "--rise-delay": "90ms" } as React.CSSProperties}
-              >
-                Không chỉ là một chiếc hộp, mà là nơi lưu giữ{" "}
-                <span className="relative inline-block whitespace-nowrap">
-                  kỷ niệm đẹp nhất
-                  <Scribble delay={700} />
-                </span>{" "}
-                với thú cưng.
-              </h1>
-              <p
-                className="animate-rise mt-5 max-w-lg text-lg text-ink-soft"
-                style={{ "--rise-delay": "180ms" } as React.CSSProperties}
-              >
-                Một hộp thiếc đựng kỷ vật và vòng cổ gắn mã QR. Quét mã để mở trang Digital Memory riêng của bé, nơi lưu
-                ảnh, video, câu chuyện và cả cách liên lạc khi cần.
-              </p>
-              <div
-                className="animate-rise mt-8 flex flex-wrap gap-3"
-                style={{ "--rise-delay": "270ms" } as React.CSSProperties}
-              >
-                <Link href="/dat-hang" className="btn-primary min-h-12 px-6 text-base">
-                  Đặt hộp cho bé
-                </Link>
-                <Link href="/demo" className="btn-outline min-h-12 px-6 text-base">
-                  Xem trang Digital Memory mẫu
-                </Link>
-              </div>
-            </div>
+        {/* Hero: banner thương hiệu nằm dưới header trong suốt, thẻ giới thiệu đè lên mép dưới */}
+        <section className="relative -mt-[76px]">
+          <div className="relative overflow-hidden">
+            <Image
+              src={banner}
+              alt="Chú chó Golden Retriever và mèo mướp nằm cạnh nhau, bên cạnh logo Furever Pet Memory Box và dòng chữ Giữ lại những điều yêu thương"
+              preload
+              placeholder="blur"
+              sizes="100vw"
+              className="animate-fade aspect-[4/3] w-full object-cover object-[80%_center] sm:aspect-[16/9] md:aspect-auto md:h-auto"
+            />
+            {/* Chuyển màu xuống nền trang cho liền mạch */}
             <div
-              className="animate-rise relative"
-              style={{ "--rise-delay": "200ms" } as React.CSSProperties}
-            >
-              <div className="rounded-[2.5rem] bg-paper/70 p-6 ring-1 ring-sand backdrop-blur-sm sm:p-10">
-                <TinBox className="animate-float mx-auto w-full max-w-md" />
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-cream md:h-32"
+            />
+          </div>
+
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="animate-rise card relative -mt-10 grid gap-6 p-6 shadow-[0_30px_60px_-40px_rgb(63_51_41/0.5)] sm:p-8 md:-mt-28 md:grid-cols-[1.35fr_1fr] md:items-end md:gap-10 md:p-10 lg:-mt-36">
+              <div>
+                <p className="font-hand text-2xl text-rust md:hidden">Giữ lại những điều yêu thương</p>
+                <h1 className="text-[2.2rem] leading-[1.1] font-bold sm:text-5xl">
+                  Không chỉ là một chiếc hộp, mà là nơi lưu giữ{" "}
+                  <span className="relative inline-block whitespace-nowrap">
+                    kỷ niệm đẹp nhất
+                    <Scribble delay={700} />
+                  </span>{" "}
+                  với thú cưng.
+                </h1>
               </div>
-              <p className="absolute -bottom-4 left-6 rotate-[-4deg] rounded-full bg-sage px-4 py-1.5 font-hand text-lg text-white shadow-md">
-                Mỗi bé một câu chuyện
-              </p>
+              <div>
+                <p className="text-lg text-ink-soft">
+                  Một hộp thiếc đựng kỷ vật, thẻ căn cước và vòng cổ gắn mã QR. Quét mã để mở trang Digital Memory riêng của
+                  bé, nơi lưu ảnh, video, câu chuyện và cả cách liên lạc khi cần.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link href="/dat-hang" className="btn-primary min-h-12 px-6 text-base">
+                    Đặt hộp cho bé
+                  </Link>
+                  <Link href="/demo" className="btn-outline min-h-12 px-6 text-base">
+                    Xem trang mẫu
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -236,10 +231,57 @@ export default async function LandingPage() {
                   <div>
                     <h3 className="text-xl font-semibold">{title}</h3>
                     <p className="mt-1 text-ink-soft">{desc}</p>
+                    {i === 4 ? (
+                      <a href="#the-can-cuoc" className="link-underline mt-2 inline-block text-sm font-semibold text-sage-deep">
+                        Xem thẻ mẫu
+                      </a>
+                    ) : null}
                   </div>
                 </Reveal>
               ))}
             </ol>
+          </div>
+        </section>
+
+        {/* Thẻ căn cước thú cưng */}
+        <section id="the-can-cuoc" className="scroll-mt-20 overflow-hidden">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-[1.25fr_1fr]">
+            <Reveal variant="left">
+              <div className="group relative">
+                <div
+                  aria-hidden="true"
+                  className="absolute -inset-4 -z-10 rotate-2 rounded-[2.5rem] bg-peach-soft transition-transform duration-700 group-hover:rotate-0"
+                />
+                <Image
+                  src={idCard}
+                  alt="Thẻ căn cước thú cưng Furever của bé mèo Meo Vàng: ảnh của bé, tên, giống mèo ta, năm sinh 2025, giới tính cái, tên chủ nuôi và ngày cấp thẻ"
+                  placeholder="blur"
+                  sizes="(min-width: 1024px) 620px, (min-width: 768px) 55vw, 100vw"
+                  className="w-full rounded-[2rem] shadow-[0_30px_60px_-30px_rgb(63_51_41/0.55)] transition-transform duration-700 group-hover:-translate-y-1"
+                />
+              </div>
+            </Reveal>
+            <div>
+              <SectionTitle eyebrow="Thẻ căn cước thú cưng" title="Mỗi bé một tấm thẻ của riêng mình.">
+                Thẻ in ảnh và thông tin của bé, nằm trong hộp kỷ vật cùng vòng cổ QR. Một món nhỏ để nhớ rằng bé luôn là một thành
+                viên trong nhà.
+              </SectionTitle>
+              <Reveal delay={120}>
+                <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  {["Ảnh của bé", "Tên bé", "Giống", "Năm sinh", "Giới tính", "Tên chủ nuôi", "Ngày cấp thẻ", "Lời nhắn viết tay"].map(
+                    (f) => (
+                      <li key={f} className="flex items-center gap-2 border-b border-dashed border-sand pb-2">
+                        <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-rust" />
+                        {f}
+                      </li>
+                    ),
+                  )}
+                </ul>
+                <p className="mt-6 text-sm text-ink-soft">
+                  Thông tin trên thẻ lấy từ hồ sơ bạn gửi khi đặt hộp, nên chỉ cần gửi một lần.
+                </p>
+              </Reveal>
+            </div>
           </div>
         </section>
 
